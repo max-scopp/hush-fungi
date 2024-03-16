@@ -10,6 +10,7 @@
  */
 import { BrowserWindow, app, ipcMain, shell } from "electron";
 import log from "electron-log";
+import ElectronStore from "electron-store";
 import { autoUpdater } from "electron-updater";
 import path from "path";
 import { channels } from "../shared/channels";
@@ -45,21 +46,24 @@ if (isDebug) {
 }
 
 const installExtensions = async () => {
-  const installer = require("electron-devtools-installer");
-  const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
-  const extensions = ["REACT_DEVELOPER_TOOLS"];
+  const {
+    default: installExtension,
+    REACT_DEVELOPER_TOOLS,
+  } = require("electron-devtools-installer");
 
-  return installer
-    .default(
-      extensions.map((name) => installer[name]),
-      forceDownload,
-    )
-    .catch(console.log);
+  return installExtension(REACT_DEVELOPER_TOOLS);
 };
 
 const createWindow = async () => {
   if (isDebug) {
-    await installExtensions();
+    const extensions = await installExtensions();
+    log.debug(`
+   
+   
+   added exts: ${extensions}
+   
+   
+   `);
   }
 
   const RESOURCES_PATH = app.isPackaged
@@ -72,7 +76,7 @@ const createWindow = async () => {
 
   mainWindow = new BrowserWindow({
     show: false,
-    width: 1024,
+    width: 460,
     height: 728,
     icon: getAssetPath("icon.png"),
     // titleBarOverlay: true,
@@ -150,3 +154,5 @@ app
 log.initialize();
 
 ipcMain.on(channels.QUIT, () => app.quit());
+
+ElectronStore.initRenderer();

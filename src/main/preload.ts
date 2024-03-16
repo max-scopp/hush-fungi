@@ -1,7 +1,22 @@
 import { IpcRendererEvent, contextBridge, ipcRenderer } from "electron";
 import { Channel } from "../shared/channels";
+import { store } from "./store";
 
 const electronHandler = {
+  storage: {
+    get(key: string) {
+      return store.get(key);
+    },
+    set(key: string, value: any) {
+      return store.set(key, value);
+    },
+    has(key: string) {
+      return store.has(key);
+    },
+    delete(key: string) {
+      return store.delete(key);
+    },
+  },
   ipcRenderer: {
     sendMessage(channel: Channel, ...args: unknown[]) {
       ipcRenderer.send(channel, ...args);

@@ -12,6 +12,7 @@ export function buildTheme(): ThemeConfig {
     token: {
       colorPrimary: getCssVar("--sys-accent-color"),
       borderRadius: 6,
+      fontSizeIcon: 24,
 
       // colorBgContainer: "transparent",
     },

@@ -1,5 +1,6 @@
 import { Button, Card, Flex, Input, Result, Steps } from "antd";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { channels } from "../../shared/channels";
 import { EmojiIcon } from "../components/EmojiIcon";
 
@@ -45,8 +46,11 @@ const steps = [
 ];
 
 export function FirstStart() {
+  const navigate = useNavigate();
+
   const [showIntro, setShowIntro] = useState(true);
   const [current, setCurrent] = useState(0);
+  const [hassUrl, setHassUrl] = useState("http://homeassistant.local:8123");
 
   const next = () => {
     setCurrent(current + 1);
@@ -66,11 +70,18 @@ export function FirstStart() {
         title="Welcome to eHASS!"
         subTitle="We need to connect to your Home Assistant instance. I will guide you through this process. "
         extra={[
-          <Input placeholder="Example" />,
+          <Input
+            placeholder="Example"
+            defaultValue={hassUrl}
+            onChange={(event) => setHassUrl(event.currentTarget.value)}
+          />,
           <Button
             type="primary"
             key="console"
-            onClick={() => setShowIntro(false)}
+            onClick={() => {
+              window.electron.storage.set("hassUrl", hassUrl);
+              navigate("/");
+            }}
           >
             Let's get going!
           </Button>,
