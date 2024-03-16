@@ -47,6 +47,7 @@
   },
   "license": "MIT",
   "dependencies": {
+    "@ant-design/icons": "^5.3.3",
     "@types/react": "^18.2.64",
     "@types/react-dom": "^18.2.21",
     "antd": "^5.15.2",
@@ -56,6 +57,7 @@
     "electron-updater": "^6.1.8",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-router-dom": "^6.22.3",
     "throttle-debounce": "^5.0.0",
     "usehooks-ts": "^3.0.1"
   }

@@ -1,8 +1,11 @@
-import { Alert, Button, ConfigProvider, DatePicker, Space } from "antd";
+import { ConfigProvider } from "antd";
 import { log } from "electron-log";
 import { useState } from "react";
+import { HashRouter, Route, Routes } from "react-router-dom";
 import { channels } from "../shared/channels";
 import { buildTheme } from "./buildTheme";
+import { Home } from "./pages/Home";
+import { NoRoute } from "./pages/NoRoute";
 
 export function App() {
   const [theme, setTheme] = useState(buildTheme());
@@ -14,11 +17,12 @@ export function App() {
   return (
     <>
       <ConfigProvider theme={theme}>
-        <Alert message="Hello fromr react!" />
-        <Space>
-          <DatePicker />
-          <Button type="primary">Primary Button</Button>
-        </Space>
+        <HashRouter>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="*" element={<NoRoute />} />
+          </Routes>
+        </HashRouter>
       </ConfigProvider>
     </>
   );
