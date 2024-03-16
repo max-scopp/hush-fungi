@@ -1,3 +1,4 @@
+import { HassServiceTarget, callService } from "home-assistant-js-websocket";
 import { useContext } from "react";
 import { HassContext } from "./HassContext";
 
@@ -13,6 +14,14 @@ export function useHass() {
     },
     get auth() {
       return getAuth();
+    },
+    callService(
+      domain: string,
+      service: string,
+      serviceData?: object,
+      target?: HassServiceTarget,
+    ): Promise<unknown> {
+      return callService(getConnection(), domain, service, serviceData, target);
     },
   };
 }

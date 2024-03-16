@@ -87,7 +87,9 @@ const createWindow = async () => {
     minimizable: false,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
+      webSecurity: false,
       nodeIntegration: true,
+      enableBlinkFeatures: "OverlayScrollbars",
       // preload: app.isPackaged
       //   ? path.join(__dirname, "preload.js")
       //   : path.join(__dirname, "../../.erb/dll/preload.js"),

@@ -1,0 +1,9 @@
+.entity-icon-button {
+  background: hsl(0deg 100% 100% / 6%);
+
+  transition-property: all;
+
+  &:active {
+    transform: scale(1.2);
+  }
+}
