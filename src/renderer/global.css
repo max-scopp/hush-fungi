@@ -2,6 +2,13 @@ body {
   font-family: system-ui;
   margin: auto;
   min-height: 100vh;
+
+  color: CanvasText;
+}
+
+html,
+body {
+  background: unset !important;
 }
 
 #root {
