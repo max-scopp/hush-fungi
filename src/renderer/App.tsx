@@ -4,6 +4,7 @@ import { useState } from "react";
 import { HashRouter, Route, Routes } from "react-router-dom";
 import { channels } from "../shared/channels";
 import { buildTheme } from "./buildTheme";
+import { FirstStart } from "./pages/FirstStart";
 import { Home } from "./pages/Home";
 import { NoRoute } from "./pages/NoRoute";
 
@@ -20,6 +21,7 @@ export function App() {
         <HashRouter>
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/first-start" element={<FirstStart />} />
             <Route path="*" element={<NoRoute />} />
           </Routes>
         </HashRouter>

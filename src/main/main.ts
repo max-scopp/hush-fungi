@@ -12,6 +12,7 @@ import { BrowserWindow, app, ipcMain, shell } from "electron";
 import log from "electron-log";
 import { autoUpdater } from "electron-updater";
 import path from "path";
+import { channels } from "../shared/channels";
 import { injectStyleableSystemPreferences } from "./helpers/injectStylableSystemPreferences";
 import { resolveHtmlPath } from "./helpers/resolveHtmlPath";
 
@@ -79,8 +80,10 @@ const createWindow = async () => {
     // frame: false,
     autoHideMenuBar: true,
     backgroundMaterial: "mica",
+    minimizable: false,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
+      nodeIntegration: true,
       // preload: app.isPackaged
       //   ? path.join(__dirname, "preload.js")
       //   : path.join(__dirname, "../../.erb/dll/preload.js"),
@@ -145,3 +148,5 @@ app
   .catch(console.log);
 
 log.initialize();
+
+ipcMain.on(channels.QUIT, () => app.quit());
