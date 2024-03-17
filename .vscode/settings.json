@@ -1,3 +1,6 @@
 {
-    "typescript.preferences.importModuleSpecifier": "relative"
+    "typescript.preferences.importModuleSpecifier": "relative",
+    "editor.rulers": [
+        79,120
+    ]
 }

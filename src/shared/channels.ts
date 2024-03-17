@@ -8,6 +8,10 @@ export const channels = {
   REACT_LOADED: "ehs_react_loaded",
   MAIN_RESPOND_REACT_LOADED: "ehs_confirm_react_loaded",
   WS_CONNECTED: "ehs_ws_connected",
+
+  // hass channels
+  HASS_CHANGED_PHASE: "hass_changed_phase",
+  HASS_RECONNECT: "hass_reconnect",
 } as const;
 
 export type Channels = typeof channels;

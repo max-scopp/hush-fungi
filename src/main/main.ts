@@ -8,19 +8,28 @@
  * When running `npm run build` or `npm run build:main`, this file is compiled to
  * `./src/main/main.js` using webpack. This gives us some performance wins.
  */
-import { BrowserWindow, app, ipcMain, shell } from "electron";
-import log from "electron-log";
+import Remote from "@electron/remote/main";
+import { BrowserWindow, app, dialog, ipcMain, shell } from "electron";
+import { log, default as logger } from "electron-log";
 import ElectronStore from "electron-store";
 import { autoUpdater } from "electron-updater";
+import http from "http";
 import path from "path";
 import { channels } from "../shared/channels";
+import {
+  APP_INTERNAL_HOST,
+  APP_INTERNAL_PORT,
+  APP_PROTOCOL_NAME,
+} from "../shared/constants";
+import { HassConnection } from "./hass/hassConnection";
 import { injectStyleableSystemPreferences } from "./helpers/injectStylableSystemPreferences";
+import { isMac } from "./helpers/osPlatform";
 import { resolveHtmlPath } from "./helpers/resolveHtmlPath";
 
 class AppUpdater {
   constructor() {
-    log.transports.file.level = "info";
-    autoUpdater.logger = log;
+    logger.transports.file.level = "info";
+    autoUpdater.logger = logger;
     autoUpdater.checkForUpdatesAndNotify();
   }
 }
@@ -32,11 +41,6 @@ ipcMain.on("ipc-example", async (event, arg) => {
   console.log(msgTemplate(arg));
   event.reply("ipc-example", msgTemplate("pong"));
 });
-
-if (process.env.NODE_ENV === "production") {
-  const sourceMapSupport = require("source-map-support");
-  sourceMapSupport.install();
-}
 
 const isDebug =
   process.env.NODE_ENV === "development" || process.env.DEBUG_PROD === "true";
@@ -57,13 +61,7 @@ const installExtensions = async () => {
 const createWindow = async () => {
   if (isDebug) {
     const extensions = await installExtensions();
-    log.debug(`
-   
-   
-   added exts: ${extensions}
-   
-   
-   `);
+    logger.debug(`Installed extensions: ${extensions}`);
   }
 
   const RESOURCES_PATH = app.isPackaged
@@ -90,18 +88,19 @@ const createWindow = async () => {
       webSecurity: false,
       nodeIntegration: true,
       enableBlinkFeatures: "OverlayScrollbars",
+      // enableRemoteModule: true,
       // preload: app.isPackaged
       //   ? path.join(__dirname, "preload.js")
       //   : path.join(__dirname, "../../.erb/dll/preload.js"),
     },
   });
 
-  mainWindow.loadURL(resolveHtmlPath("index.html"));
+  Remote.enable(mainWindow.webContents);
+
+  const startUrl = resolveHtmlPath("index.html");
+  mainWindow.loadURL(startUrl);
 
   mainWindow.on("ready-to-show", () => {
-    if (!mainWindow) {
-      throw new Error('"mainWindow" is not defined');
-    }
     if (process.env.START_MINIMIZED) {
       mainWindow.minimize();
     } else {
@@ -117,6 +116,16 @@ const createWindow = async () => {
 
   // const menuBuilder = new MenuBuilder(mainWindow);
   // menuBuilder.buildMenu();
+
+  mainWindow.webContents.on("will-navigate", (event) => {
+    const nonElectronUrl = !event.url.startsWith(startUrl);
+    if (nonElectronUrl) {
+      shell.openExternal(event.url);
+      event.preventDefault();
+
+      return { action: "deny" };
+    }
+  });
 
   // Open urls in the user's browser
   mainWindow.webContents.setWindowOpenHandler((edata) => {
@@ -136,25 +145,126 @@ const createWindow = async () => {
 app.on("window-all-closed", () => {
   // Respect the OSX convention of having the application in memory even
   // after all windows have been closed
-  if (process.platform !== "darwin") {
+  if (!isMac) {
     app.quit();
   }
 });
 
-app
-  .whenReady()
-  .then(() => {
-    createWindow();
-    app.on("activate", () => {
-      // On macOS it's common to re-create a window in the app when the
-      // dock icon is clicked and there are no other windows open.
-      if (mainWindow === null) createWindow();
-    });
-  })
-  .catch(console.log);
-
-log.initialize();
-
 ipcMain.on(channels.QUIT, () => app.quit());
 
 ElectronStore.initRenderer();
+HassConnection.init();
+Remote.initialize();
+
+if (process.defaultApp) {
+  if (process.argv.length >= 2) {
+    app.setAsDefaultProtocolClient(APP_PROTOCOL_NAME, process.execPath, [
+      path.resolve(process.argv[1]),
+    ]);
+  }
+} else {
+  app.setAsDefaultProtocolClient(APP_PROTOCOL_NAME);
+}
+
+if (isMac) {
+  // This method will be called when Electron has finished
+  // initialization and is ready to create browser windows.
+  // Some APIs can only be used after this event occurs.
+  whenReadyCreateMainWindow();
+
+  // Handle the protocol. In this case, we choose to show an Error Box.
+  app.on("open-url", (event, url) => {
+    handleProtocolUrl(url);
+  });
+} else {
+  const gotTheLock = app.requestSingleInstanceLock();
+
+  if (!gotTheLock) {
+    app.quit();
+    // TODO: Probably not good
+    process.exit();
+  } else {
+    app.on("second-instance", (event, commandLine, workingDirectory) => {
+      // TODO: Investiage if wanted on windows when shipping
+      // // Someone tried to run a second instance, we should focus our window.
+      // if (mainWindow) {
+      //   focusMainWindow();
+      // }
+      // the commandLine is array of strings in which last element is deep link url
+      handleProtocolUrl(commandLine.pop());
+    });
+
+    // Create mainWindow, load the rest of the app, etc...
+    whenReadyCreateMainWindow();
+  }
+}
+
+function focusMainWindow() {
+  if (mainWindow.isMinimized()) mainWindow.restore();
+  mainWindow.focus();
+}
+
+function whenReadyCreateMainWindow() {
+  logger.initialize();
+  app
+    .whenReady()
+    .then(() => {
+      createWindow();
+
+      app.on("activate", () => {
+        // On macOS it's common to re-create a window in the app when the
+        // dock icon is clicked and there are no other windows open.
+        if (mainWindow === null) createWindow();
+      });
+    })
+    .catch(console.log);
+}
+
+// server configuration
+
+// create the server
+const server = http.createServer((req, res) => {
+  const url = new URL(req.url, global.localServerAddress);
+
+  if (
+    url.searchParams.has("auth_callback") &&
+    url.searchParams.has("state") &&
+    url.searchParams.has("storeToken")
+  ) {
+    const startUrl = resolveHtmlPath("index.html");
+    const params = /(\?.*$)/.exec(req.url)[0];
+
+    const redirected = startUrl + params;
+
+    mainWindow.webContents.loadURL(redirected);
+    res.end(`<head>
+    <meta http-equiv="Refresh" content="0; URL=hush-fungi://focus" />
+  </head><body>You're done!</body>`);
+    return;
+  }
+
+  res.end(`Noo peeking ;)`);
+});
+
+globalThis.localServerAddress = new URL(
+  `http://${APP_INTERNAL_HOST}:${APP_INTERNAL_PORT}/`,
+).toString();
+
+// make the server listen to requests
+server.listen(APP_INTERNAL_PORT, APP_INTERNAL_HOST, () => {
+  log(`Server running at: ${globalThis.localServerAddress}`);
+});
+
+function handleProtocolUrl(url: string) {
+  const { hostname } = new URL(url);
+  switch (hostname) {
+    case "focus":
+      focusMainWindow();
+      break;
+    default:
+      dialog.showErrorBox(
+        "Protocol Failure",
+        `No known action for "${hostname}"`,
+      );
+  }
+}

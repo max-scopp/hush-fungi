@@ -1,152 +1,78 @@
 import { log } from "electron-log";
 import {
-  ERR_CANNOT_CONNECT,
-  ERR_INVALID_AUTH,
-  MSG_TYPE_AUTH_INVALID,
-  MSG_TYPE_AUTH_OK,
-  MSG_TYPE_AUTH_REQUIRED,
-  type Auth,
+  Auth,
+  Connection,
+  createConnection,
 } from "home-assistant-js-websocket";
-import WebSocket from "ws";
+import { HassConnectionPhase } from "./HassConnectionPhase";
+import { HassRenderer } from "./HassRenderer";
+import { hassAuth } from "./hassAuth";
+import { hassUrl } from "./hassUrl";
+Object.assign(global, { WebSocket: require("ws") });
 
-interface HaWebSocket extends WebSocket {
-  haVersion: string;
-}
+export class HassConnection {
+  private static _instance: HassConnection;
+  private _auth: Auth = null;
+  connection: Connection = null;
 
-export function createSocket(
-  auth: Auth,
-  ignoreCertificates: boolean,
-): Promise<any> {
-  // Convert from http:// -> ws://, https:// -> wss://
-  const url = auth.wsUrl;
+  /**
+   * Due to the auth encryption, you must init hass after the electron app
+   * is ready to create it's first window.
+   */
+  static init() {
+    if (!HassConnection._instance) {
+      HassConnection._instance = new HassConnection();
+    }
 
-  log("[Auth phase] Initializing WebSocket connection to Home Assistant", url);
-
-  function connect(
-    triesLeft: number,
-    promResolve: (socket: any) => void,
-    promReject: (err: number) => void,
-  ) {
-    log(
-      `[Auth Phase] Connecting to Home Assistant... Tries left: ${triesLeft}`,
-      url,
-    );
-
-    const socket = new WebSocket(url, {
-      rejectUnauthorized: !ignoreCertificates,
-    }) as HaWebSocket;
-
-    // If invalid auth, we will not try to reconnect.
-    let invalidAuth = false;
-
-    const closeMessage = (ev: {
-      wasClean: boolean;
-      code: number;
-      reason: string;
-      target: WebSocket;
-    }) => {
-      let errorMessage;
-      if (ev && ev.code && ev.code !== 1000) {
-        errorMessage = `WebSocket connection to Home Assistant closed with code ${ev.code} and reason ${ev.reason}`;
-      }
-      closeOrError(errorMessage);
-    };
-
-    const errorMessage = (ev: {
-      error: any;
-      message: any;
-      type: string;
-      target: WebSocket;
-    }) => {
-      // If we are in error handler make sure close handler doesn't also fire.
-      socket.removeEventListener("close", closeMessage);
-      let errMessage =
-        "Disconnected from Home Assistant with a WebSocket error";
-      if (ev.message) {
-        errMessage += ` with message: ${ev.message}`;
-      }
-      closeOrError(errMessage);
-    };
-
-    const closeOrError = (errorText?: string) => {
-      if (errorText) {
-        log(
-          `WebSocket Connection to Home Assistant closed with an error: ${errorText}`,
-        );
-      }
-      if (invalidAuth) {
-        promReject(ERR_INVALID_AUTH);
-        return;
-      }
-
-      // Reject if we no longer have to retry
-      if (triesLeft === 0) {
-        // We never were connected and will not retry
-        promReject(ERR_CANNOT_CONNECT);
-        return;
-      }
-
-      const newTries = triesLeft === -1 ? -1 : triesLeft - 1;
-      // Try again in a second
-      setTimeout(() => connect(newTries, promResolve, promReject), 1000);
-    };
-
-    // Auth is mandatory, so we can send the auth message right away.
-    const handleOpen = async (): Promise<void> => {
-      try {
-        if (auth.expired) {
-          await auth.refreshAccessToken();
-        }
-        socket.send(
-          JSON.stringify({
-            type: "auth",
-            access_token: auth.accessToken,
-          }),
-        );
-      } catch (err) {
-        // Refresh token failed
-        invalidAuth = err === ERR_INVALID_AUTH;
-        socket.close();
-      }
-    };
-
-    const handleMessage = (event: {
-      data: any;
-      type: string;
-      target: WebSocket;
-    }) => {
-      const message = JSON.parse(event.data);
-
-      log(`[Auth phase] Received a message of type ${message.type}`, message);
-
-      switch (message.type) {
-        case MSG_TYPE_AUTH_INVALID:
-          invalidAuth = true;
-          socket.close();
-          break;
-
-        case MSG_TYPE_AUTH_OK:
-          socket.removeEventListener("open", handleOpen);
-          socket.removeEventListener("message", handleMessage);
-          socket.removeEventListener("close", closeMessage);
-          socket.removeEventListener("error", errorMessage);
-          socket.haVersion = message.ha_version;
-          promResolve(socket);
-          break;
-
-        default:
-          // We already send this message when socket opens
-          if (message.type !== MSG_TYPE_AUTH_REQUIRED) {
-            log("[Auth phase] Unhandled message", message);
-          }
-      }
-    };
-
-    socket.addEventListener("open", handleOpen);
-    socket.addEventListener("message", handleMessage);
-    socket.addEventListener("close", closeMessage);
-    socket.addEventListener("error", errorMessage);
+    return HassConnection._instance;
   }
 
-  return new Promise((resolve, reject) => connect(3, resolve, reject));
+  static getRenderer() {
+    return new HassRenderer(
+      HassConnection._instance?.connection,
+      HassConnection._instance?._auth,
+    );
+  }
+
+  constructor() {
+    if (HassConnection._instance) {
+      throw new Error(
+        "HassConnection is a singleton and cannot be created anymore.",
+      );
+    }
+
+    this.recoverAsync().catch(log);
+  }
+
+  static _phase: HassConnectionPhase = "unknown";
+
+  publishNewPhase(phase: HassConnectionPhase) {
+    log(`Publish new phase: ${phase}`);
+    global.hassConnectionPhase = phase;
+  }
+
+  async recoverAsync() {
+    if (!hassUrl.isHassKnown()) {
+      log("[HASS] dont recover - hass not known yet");
+      this.publishNewPhase("hass-not-known");
+      return;
+    }
+
+    log("[HASS] recover auth");
+    this._auth = await hassAuth.getAuth();
+
+    if (!this._auth) {
+      log("[HASS] no auth to recover");
+      this.publishNewPhase("failed-auth");
+      return;
+    }
+
+    log("[HASS] ws: connecting...");
+    this.connection = await createConnection({
+      auth: this._auth,
+      setupRetry: 3,
+    });
+    this.publishNewPhase("connected");
+    log("[HASS] ws: connected!");
+  }
 }

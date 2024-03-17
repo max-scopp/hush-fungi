@@ -1,16 +1,38 @@
 import { ConfigProvider } from "antd";
 import { log } from "electron-log";
+import { createLongLivedTokenAuth, getAuth } from "home-assistant-js-websocket";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-react";
 import { Suspense, useState } from "react";
-import { HashRouter, Route, Routes } from "react-router-dom";
+import { RouterProvider } from "react-router-dom";
 import { useMediaQuery } from "usehooks-ts";
 import { channels } from "../shared/channels";
+import { STORE_HASS_AUTH, STORE_HASS_URL } from "../shared/constants";
 import styles from "./App.module.scss";
 import { buildTheme } from "./buildTheme";
-import { HassProvider } from "./modules/Hass/HassProvider";
-import { FirstStart } from "./pages/FirstStart";
-import { Home } from "./pages/Home";
-import { NoRoute } from "./pages/NoRoute";
+import { DebugHint } from "./components/DebugHint";
+import { router } from "./router";
+
+const url = new URL(location.href);
+if (url.searchParams.has("auth_callback")) {
+  handleCallbackAsync();
+}
+
+async function handleCallbackAsync() {
+  const hassUrl = String(window.electron.storage.get(STORE_HASS_URL));
+  log(`Trying authentication against instance ${hassUrl}`);
+
+  const retrievedAuth = await getAuth({
+    hassUrl,
+    saveTokens: (data) => {
+      debugger;
+      window.electron.storage.set(STORE_HASS_AUTH, data);
+    },
+  });
+
+  const long = createLongLivedTokenAuth(hassUrl, retrievedAuth.accessToken);
+  await long.refreshAccessToken();
+  log("hass: long lived token refreshed");
+}
 
 export function App() {
   const isDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
@@ -25,25 +47,18 @@ export function App() {
     <>
       <ConfigProvider theme={theme}>
         <Suspense fallback="establish connection...">
-          <HassProvider>
-            <OverlayScrollbarsComponent
-              defer
-              options={{
-                scrollbars: {
-                  theme: isDarkMode ? "os-theme-light" : "os-theme-dark",
-                },
-              }}
-              className={styles.scrollContainer}
-            >
-              <HashRouter>
-                <Routes>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/first-start" element={<FirstStart />} />
-                  <Route path="*" element={<NoRoute />} />
-                </Routes>
-              </HashRouter>
-            </OverlayScrollbarsComponent>
-          </HassProvider>
+          <OverlayScrollbarsComponent
+            defer
+            options={{
+              scrollbars: {
+                theme: isDarkMode ? "os-theme-light" : "os-theme-dark",
+              },
+            }}
+            className={styles.scrollContainer}
+          >
+            <RouterProvider router={router} />
+          </OverlayScrollbarsComponent>
+          <DebugHint />
         </Suspense>
       </ConfigProvider>
     </>

@@ -27,6 +27,7 @@
     "@types/electron-devtools-installer": "~2.2.5",
     "@types/electron-squirrel-startup": "~1.0.2",
     "@types/eslint": "~8.56.5",
+    "@types/http-server": "~0.12.4",
     "@types/pascal-case": "~1.1.2",
     "@types/throttle-debounce": "~5.0.2",
     "@types/ws": "~8.5.10",
@@ -51,6 +52,7 @@
   "license": "MIT",
   "dependencies": {
     "@ant-design/icons": "^5.3.3",
+    "@electron/remote": "^2.1.2",
     "@mdi/js": "^7.4.47",
     "@mdi/react": "^1.6.1",
     "@react-spring/web": "^9.7.3",

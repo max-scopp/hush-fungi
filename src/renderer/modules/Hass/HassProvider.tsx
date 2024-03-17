@@ -20,9 +20,6 @@ type HassProviderProps = {
   children: ReactNode;
 };
 
-const hassUrl = String(window.electron.storage.get("hassUrl"));
-const hassTokens = window.electron.storage.get("hassTokens") as any;
-
 export function HassProvider({ children }: HassProviderProps) {
   const { auth, connection } = suspend(async () => {
     if (!hassUrl) {
