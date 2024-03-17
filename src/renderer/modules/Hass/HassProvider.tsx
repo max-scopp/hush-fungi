@@ -44,6 +44,8 @@ export function HassProvider({ children }: HassProviderProps) {
 
       const connection = await createConnection({ auth: longAuth });
 
+      setTimeout(() => auth.refreshAccessToken(), auth.data.expires_in - 2e3);
+
       return { auth: longAuth, connection };
     } catch (err) {
       switch (err) {

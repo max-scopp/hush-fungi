@@ -1,0 +1,62 @@
+.colorTempGradient {
+  background: linear-gradient(
+    to right,
+    #ff9227 0%,
+    #ff9a3b 10%,
+    #ffa14c 20%,
+    #ffa85b 30.000000000000004%,
+    #ffaf68 40%,
+    #ffb475 50%,
+    #ffba80 60.00000000000001%,
+    #ffbf8b 70%,
+    #ffc494 80%,
+    #ffc99e 90%,
+    #ffcea6 100%
+  );
+
+  border-radius: var(--ehs-border-radius);
+
+  height: 40px;
+  width: 100%;
+}
+
+.sliderKnob {
+  position: relative;
+  width: 32px;
+  height: 100%;
+
+  margin: 0 -11px;
+  cursor: pointer;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 12px;
+    height: 100%;
+    border-radius: 12px;
+    background: hsl(0 0% 83% / 96%);
+    transform: translate(-50%, -50%);
+
+    transition: all ease-out 300ms;
+
+    box-shadow: 1px 0 3px hsl(0deg 0% 0% / 12%);
+  }
+
+  &:active::before {
+    box-shadow: 1px 0 7px hsl(0deg 0% 0% / 32%);
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 6px;
+    height: 6px;
+    border-radius: 6px;
+    background-color: black;
+    transform: translate(-50%, -50%);
+  }
+}
