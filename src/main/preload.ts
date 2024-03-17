@@ -1,9 +1,7 @@
 import { getGlobal } from "@electron/remote";
 import { IpcRendererEvent, contextBridge, ipcRenderer } from "electron";
+import { HassServiceTarget } from "home-assistant-js-websocket";
 import { Channel, channels } from "../shared/channels";
-import { HassConnectionPhase } from "./hass/HassConnectionPhase";
-import { HassConnection } from "./hass/hassConnection";
-import { hassUrl } from "./hass/hassUrl";
 import { store } from "./store";
 
 const electronHandler = {
@@ -48,35 +46,33 @@ const electronHandler = {
   },
 };
 
-ipcRenderer.on(
-  channels.HASS_CHANGED_PHASE,
-  (_event, phase) => (hassHandler.phase = phase),
-);
-
 const hassHandler = {
-  isHassKnown() {
-    return hassUrl.isHassKnown();
-  },
-  phase: HassConnection._phase,
-  getUrl() {
-    return hassUrl.getUrl();
-  },
   reconnect() {
     ipcRenderer.send(channels.HASS_RECONNECT);
   },
-  whenReady() {
-    return new Promise((resolve) => {
-      resolve(true);
-      const whenReadyListener = (
-        _event: IpcRendererEvent,
-        phase: HassConnectionPhase,
-      ) => {
-        resolve(phase);
-        ipcRenderer.off(channels.HASS_CHANGED_PHASE, whenReadyListener);
-      };
-
-      ipcRenderer.on(channels.HASS_CHANGED_PHASE, whenReadyListener);
-    });
+  callService(
+    domain: string,
+    service: string,
+    serviceData?: object,
+    target?: HassServiceTarget,
+  ) {
+    ipcRenderer.send(
+      channels.HASS_CALL_SERVICE,
+      domain,
+      service,
+      serviceData,
+      target,
+    );
+  },
+  async runTemplate<R = string | object>(
+    template: string,
+    options: { treatAsJson?: boolean },
+  ): Promise<R> {
+    return ipcRenderer.invoke(
+      channels.HASS_RUN_TEMPLATE,
+      template,
+      options.treatAsJson,
+    );
   },
 };
 

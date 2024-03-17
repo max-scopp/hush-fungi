@@ -1,9 +1,7 @@
-import { useContext } from "react";
 import { filterObject } from "../Common/filterObject";
-import { HassContext } from "./HassContext";
 
 export function useHassEntities() {
-  const { entities } = useContext(HassContext);
+  const entities = window.electron.remote.getGlobal("hassEntities");
 
   return {
     entities,

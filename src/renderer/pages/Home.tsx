@@ -30,7 +30,7 @@ export function Home() {
         options={[...laces]}
       />
 
-      {/* {pageToComponentsMap[page]} */}
+      {pageToComponentsMap[page]}
     </Flex>
   );
 }

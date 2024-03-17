@@ -10,8 +10,9 @@ export const channels = {
   WS_CONNECTED: "ehs_ws_connected",
 
   // hass channels
-  HASS_CHANGED_PHASE: "hass_changed_phase",
   HASS_RECONNECT: "hass_reconnect",
+  HASS_CALL_SERVICE: "hass_call_service",
+  HASS_RUN_TEMPLATE: "hass_run_template",
 } as const;
 
 export type Channels = typeof channels;
