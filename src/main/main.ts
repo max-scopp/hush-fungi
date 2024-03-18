@@ -58,6 +58,10 @@ const installExtensions = async () => {
   return installExtension(REACT_DEVELOPER_TOOLS);
 };
 
+const MAIN_WINDOW_START_URL = resolveHtmlPath(
+  `${MAIN_WINDOW_VITE_NAME}/index.html`,
+);
+
 const createWindow = async () => {
   if (isDebug) {
     const extensions = await installExtensions();
@@ -97,7 +101,7 @@ const createWindow = async () => {
 
   Remote.enable(mainWindow.webContents);
 
-  const startUrl = resolveHtmlPath("index.html");
+  const startUrl = MAIN_WINDOW_START_URL;
   mainWindow.loadURL(startUrl);
 
   mainWindow.on("ready-to-show", () => {
@@ -231,7 +235,7 @@ const server = http.createServer((req, res) => {
     url.searchParams.has("state") &&
     url.searchParams.has("storeToken")
   ) {
-    const startUrl = resolveHtmlPath("index.html");
+    const startUrl = MAIN_WINDOW_START_URL;
     const params = /(\?.*$)/.exec(req.url)[0];
 
     const redirected = startUrl + params;
