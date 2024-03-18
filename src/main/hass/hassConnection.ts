@@ -1,16 +1,19 @@
-import { IpcMainEvent, ipcMain } from "electron";
+import { BrowserWindow, IpcMainEvent, ipcMain } from "electron";
 import { log } from "electron-log";
 import {
   Auth,
   Connection,
   HassServiceTarget,
   callService,
+  configColl,
   createConnection,
+  entitiesColl,
+  servicesColl,
   subscribeConfig,
   subscribeEntities,
   subscribeServices,
 } from "home-assistant-js-websocket";
-import { channels } from "../../shared/channels";
+import { Channel, channels } from "../../shared/channels";
 import { HassConnectionPhase } from "./HassConnectionPhase";
 import { hassAuth } from "./hassAuth";
 import { hassUrl } from "./hassUrl";
@@ -78,7 +81,7 @@ export class HassConnection {
     });
 
     log(
-      `[HASS] template received in ${((performance.now() - start) * 1_000).toFixed(2)}ms`,
+      `[HASS] template received in ${((performance.now() - start) / 1_000).toFixed(2)}ms`,
     );
 
     if (treatAsJson) {
@@ -114,18 +117,42 @@ export class HassConnection {
     log("[HASS] ws: connected!");
   }
 
+  private notifyAll(channel: Channel, ...args: any[]) {
+    BrowserWindow.getAllWindows().forEach((window) =>
+      window.webContents.send(channel, ...args),
+    );
+  }
+
   private onConnected() {
+    //#region config
     subscribeConfig(this.connection, (config) => {
-      global.hassConfig = config;
+      this.notifyAll(channels.HASS_CONFIG_CHANGED, config);
     });
 
+    ipcMain.handle(channels.HASS_GET_CONFIG, async (_event: IpcMainEvent) => {
+      return configColl(this.connection).state;
+    });
+    //#endregion
+
+    //#region services
     subscribeServices(this.connection, (services) => {
-      global.hassServices = services;
+      this.notifyAll(channels.HASS_SERVICES_CHANGED, services);
     });
 
-    subscribeEntities(this.connection, (entities) => {
-      global.hassEntities = entities;
+    ipcMain.handle(channels.HASS_GET_SERVICES, async (_event: IpcMainEvent) => {
+      return servicesColl(this.connection).state;
     });
+    //#endregion
+
+    //#region entities
+    subscribeEntities(this.connection, (entities) => {
+      this.notifyAll(channels.HASS_ENTITIES_CHANGED, entities);
+    });
+
+    ipcMain.handle(channels.HASS_GET_ENTITIES, async (_event: IpcMainEvent) => {
+      return entitiesColl(this.connection).state;
+    });
+    //#endregion
 
     ipcMain.on(
       channels.HASS_CALL_SERVICE,
@@ -142,8 +169,11 @@ export class HassConnection {
 
     ipcMain.handle(
       channels.HASS_RUN_TEMPLATE,
-      async (event: IpcMainEvent, template: string, treatAsJson?: boolean) => {
+      async (_event: IpcMainEvent, template: string, treatAsJson?: boolean) => {
         return this.template(template, treatAsJson);
+
+        // TODO: The below code should work, but I dont know why it doesnt
+        // hass-frontend boils down to pretty much the same
 
         // const result = await this.connection.sendMessagePromise({
         //   type: "render_template",

@@ -12,6 +12,7 @@ import Remote from "@electron/remote/main";
 import { BrowserWindow, app, dialog, ipcMain, shell } from "electron";
 import { log, default as logger } from "electron-log";
 import ElectronStore from "electron-store";
+import unhandled from "electron-unhandled";
 import { autoUpdater } from "electron-updater";
 import http from "http";
 import path from "path";
@@ -156,6 +157,8 @@ app.on("window-all-closed", () => {
 
 ipcMain.on(channels.QUIT, () => app.quit());
 
+logger.initialize();
+unhandled();
 ElectronStore.initRenderer();
 HassConnection.init();
 Remote.initialize();
@@ -209,7 +212,6 @@ function focusMainWindow() {
 }
 
 function whenReadyCreateMainWindow() {
-  logger.initialize();
   app
     .whenReady()
     .then(() => {

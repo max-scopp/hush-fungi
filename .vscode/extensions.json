@@ -1,6 +1,8 @@
 {
   "recommendations": [
     "esbenp.prettier-vscode",
-    "clinyong.vscode-css-modules"
+    "clinyong.vscode-css-modules",
+    "txava.region-marker",
+    "wiensss.region-highlighter"
   ]
 }
