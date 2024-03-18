@@ -1,11 +1,13 @@
 import { HassEntity } from "home-assistant-js-websocket";
+import { Domain } from "./Domain";
 
 const REGEXP_MATCH_DOMAIN = /^[^.]+/;
 
 export function getEntityDomain(entityOrEntityId: HassEntity | string) {
-  if (typeof entityOrEntityId === "string") {
-    return entityOrEntityId.match(REGEXP_MATCH_DOMAIN)[0];
-  }
+  const entityId =
+    typeof entityOrEntityId === "string"
+      ? entityOrEntityId
+      : entityOrEntityId.entity_id;
 
-  return entityOrEntityId.entity_id.match(/^[^.]+/)[0];
+  return entityId.match(REGEXP_MATCH_DOMAIN)[0] as Domain;
 }

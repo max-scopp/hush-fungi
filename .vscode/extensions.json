@@ -1,7 +1,8 @@
 {
   "recommendations": [
     "esbenp.prettier-vscode",
-    "formulahendry.auto-rename-tag",
-    "clinyong.vscode-css-modules"
+    "clinyong.vscode-css-modules",
+    "txava.region-marker",
+    "wiensss.region-highlighter"
   ]
 }

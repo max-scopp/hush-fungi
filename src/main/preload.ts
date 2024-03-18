@@ -1,5 +1,14 @@
+import { getGlobal } from "@electron/remote";
 import { IpcRendererEvent, contextBridge, ipcRenderer } from "electron";
-import { Channel } from "../shared/channels";
+import Logger from "electron-log";
+import {
+  HassConfig,
+  HassEntities,
+  HassServiceTarget,
+  HassServices,
+} from "home-assistant-js-websocket";
+import { StateCreator } from "zustand";
+import { Channel, channels } from "../shared/channels";
 import { store } from "./store";
 
 const electronHandler = {
@@ -15,6 +24,20 @@ const electronHandler = {
     },
     delete(key: string) {
       return store.delete(key);
+    },
+    async openEditor() {
+      return store.openInEditor();
+    },
+  },
+  remote: {
+    getGlobal(globalName: string) {
+      const result = getGlobal(globalName);
+      if (JSON.stringify(result).length > 500) {
+        Logger.error(
+          `getGlobal("${globalName}") in renderer communicated large data. Avoid it.`,
+        );
+      }
+      return result;
     },
   },
   ipcRenderer: {
@@ -36,6 +59,88 @@ const electronHandler = {
   },
 };
 
+type EntitiesState = {
+  config: HassConfig | null;
+  services: HassServices;
+  entities: HassEntities;
+};
+
+const lazy = (work: () => Promise<any>) => work();
+
+const hassStoreCreator: StateCreator<EntitiesState> = (setState) => {
+  //#region config
+  ipcRenderer.on(channels.HASS_CONFIG_CHANGED, (_event, config) => {
+    setState({ config });
+  });
+
+  lazy(async () => {
+    const config = await ipcRenderer.invoke(channels.HASS_GET_CONFIG);
+    setState({ config });
+  });
+  //#endregion
+
+  //#region services
+  ipcRenderer.on(channels.HASS_SERVICES_CHANGED, (_event, services) => {
+    setState({ services });
+  });
+
+  lazy(async () => {
+    const services = await ipcRenderer.invoke(channels.HASS_GET_SERVICES);
+    setState({ services });
+  });
+  //#endregion
+
+  //#region entities
+  ipcRenderer.on(channels.HASS_ENTITIES_CHANGED, (_event, entities) => {
+    setState({ entities });
+  });
+
+  lazy(async () => {
+    const entities = await ipcRenderer.invoke(channels.HASS_GET_ENTITIES);
+    setState({ entities });
+  });
+  //#endregion
+
+  return {
+    config: null,
+    services: {},
+    entities: {},
+  };
+};
+
+const hassHandler = {
+  reconnect() {
+    ipcRenderer.send(channels.HASS_RECONNECT);
+  },
+  hassStoreCreator,
+  callService(
+    domain: string,
+    service: string,
+    serviceData?: object,
+    target?: HassServiceTarget,
+  ) {
+    ipcRenderer.send(
+      channels.HASS_CALL_SERVICE,
+      domain,
+      service,
+      serviceData,
+      target,
+    );
+  },
+  async runTemplate<R = string | object>(
+    template: string,
+    options: { treatAsJson?: boolean },
+  ): Promise<R> {
+    return ipcRenderer.invoke(
+      channels.HASS_RUN_TEMPLATE,
+      template,
+      options.treatAsJson,
+    );
+  },
+};
+
 contextBridge.exposeInMainWorld("electron", electronHandler);
+contextBridge.exposeInMainWorld("hass", hassHandler);
 
 export type ElectronHandler = typeof electronHandler;
+export type HassHandler = typeof hassHandler;
