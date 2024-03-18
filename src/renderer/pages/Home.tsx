@@ -3,7 +3,7 @@ import { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLocalStorage } from "usehooks-ts";
 import { AllEntitiesLace } from "../laces/AllEntitiesLace";
-import { AllLampEntitiesLace } from "../laces/AllLampEntitiesLace";
+import { AllLightsLace } from "../laces/AllLightsLace";
 
 const laces = ["all", "lamps"] as const;
 type Laces = typeof laces;
@@ -17,7 +17,7 @@ export function Home() {
 
   const pageToComponentsMap: { [key in Lace]: ReactNode } = {
     all: <AllEntitiesLace />,
-    lamps: <AllLampEntitiesLace />,
+    lamps: <AllLightsLace />,
   };
 
   return (

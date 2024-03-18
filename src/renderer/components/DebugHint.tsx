@@ -1,8 +1,18 @@
-import { Button, Space } from "antd";
+import { Badge, Button, Flex, Space } from "antd";
+import { ReactNode } from "react";
+import { HassConnectionPhase } from "../../main/hass/HassConnectionPhase";
+
+const state: { [key in HassConnectionPhase]: ReactNode } = {
+  "failed-auth": <Badge color="cyan" />,
+  connected: <Badge color="green" />,
+  unknown: <Badge color="yellow" />,
+  disconnected: <Badge color="red" />,
+  "hass-not-known": <Badge color="grey" />,
+};
 
 export function DebugHint() {
   return (
-    <Space
+    <Flex
       style={{
         position: "fixed",
         color: "GrayText",
@@ -11,11 +21,8 @@ export function DebugHint() {
         opacity: "0.5",
         fontSize: "12px",
       }}
+      gap="1ch"
     >
-      <span>
-        <b>HASS</b>{" "}
-        <code>{window.hass?.getHaVersion?.() ?? "disconnected"}</code>
-      </span>
       <Button
         size="small"
         type="text"
@@ -23,6 +30,14 @@ export function DebugHint() {
       >
         edit storage
       </Button>
-    </Space>
+      <Space>
+        <b>HASS</b>
+        {state[
+          window.electron.remote.getGlobal(
+            "hassConnectionPhase",
+          ) as HassConnectionPhase
+        ] ?? state.unknown}
+      </Space>
+    </Flex>
   );
 }

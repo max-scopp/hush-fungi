@@ -6,7 +6,7 @@ import { filterEntities } from "../modules/Common/filterEntities";
 import { useAreas } from "../modules/Hass/useAreas";
 import { useHassStore } from "../modules/Hass/useHassStore";
 
-export function AllLampEntitiesLace() {
+export function AllLightsLace() {
   const lights = useHassStore((state) =>
     filterEntities(state.entities, "light"),
   );
@@ -17,13 +17,18 @@ export function AllLampEntitiesLace() {
     <Flex vertical>
       {areas.map((area) => {
         const areaEntities = getEntitiesForArea(lights, area);
+        const areaEntitiesKv = Object.entries(areaEntities);
+
+        if (!areaEntitiesKv.length) {
+          return <></>;
+        }
 
         return (
           <Flex vertical>
             <RoomTitle>{area.friendly_name}</RoomTitle>
             <InSafespace>
               <Flex vertical gap={10}>
-                {Object.entries(areaEntities).map(([key, entity]) => (
+                {areaEntitiesKv.map(([key, entity]) => (
                   <Tile entity={entity} key={key} />
                 ))}
               </Flex>

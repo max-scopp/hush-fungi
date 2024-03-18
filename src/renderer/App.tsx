@@ -1,4 +1,5 @@
-import { ConfigProvider } from "antd";
+import { LoadingOutlined } from "@ant-design/icons";
+import { ConfigProvider, Spin } from "antd";
 import { log } from "electron-log";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-react";
 import { Suspense, useState } from "react";
@@ -23,7 +24,13 @@ export function App() {
   return (
     <>
       <ConfigProvider theme={theme}>
-        <Suspense fallback="establish connection...">
+        <Suspense
+          fallback={
+            <Spin
+              indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />}
+            />
+          }
+        >
           <OverlayScrollbarsComponent
             defer
             options={{

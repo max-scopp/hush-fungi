@@ -1,6 +1,6 @@
-import { getGlobal } from "@electron/remote";
+import { getCurrentWindow, getGlobal } from "@electron/remote";
 import { IpcRendererEvent, contextBridge, ipcRenderer } from "electron";
-import Logger from "electron-log";
+import Logger, { log } from "electron-log";
 import {
   HassConfig,
   HassEntities,
@@ -132,6 +132,9 @@ const hassHandler = {
     serviceData?: object,
     target?: HassServiceTarget,
   ) {
+    log(
+      `(win ${getCurrentWindow().id}) hass: callService(${domain}, ${service}, ${JSON.stringify(serviceData)}, ${JSON.stringify(target)})`,
+    );
     ipcRenderer.send(
       channels.HASS_CALL_SERVICE,
       domain,
