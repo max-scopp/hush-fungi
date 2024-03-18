@@ -84,14 +84,17 @@ const createWindow = async () => {
     width: 460,
     height: 728,
     icon: getAssetPath("icon.png"),
-    titleBarOverlay: true,
-    titleBarStyle: "hiddenInset",
+    titleBarStyle: "hidden",
+    titleBarOverlay: {
+      color: "black",
+      symbolColor: "white",
+      height: 30,
+    },
     vibrancy: "fullscreen-ui",
     maximizable: false,
     minimizable: false,
     fullscreenable: false,
 
-    // frame: false,
     autoHideMenuBar: true,
     backgroundMaterial: "mica",
     webPreferences: {

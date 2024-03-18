@@ -21,11 +21,11 @@
     --text-shadow-color: hsl(0deg 0% 90% / 30%);
   }
 
-  --titlebar-height: 40px;
+  --titlebar-height: 30px;
   --fadeout-height: 15px;
 
   &[platform="darwin"] {
-    --titlebar-height: 32px;
+    --titlebar-height: 34px;
   }
 }
 
@@ -51,6 +51,9 @@
   --os-padding-perpendicular: 2px;
   --os-padding-axis: 0px;
   --os-track-border-radius: 10px;
+
+  padding-bottom: 8px;
+  padding-top: calc(var(--titlebar-height) + 4px);
 }
 
 body {
