@@ -9,7 +9,16 @@
  * `./src/main/main.js` using webpack. This gives us some performance wins.
  */
 import Remote from "@electron/remote/main";
-import { BrowserWindow, app, dialog, ipcMain, shell } from "electron";
+import {
+  BrowserWindow,
+  Menu,
+  Tray,
+  app,
+  dialog,
+  ipcMain,
+  screen,
+  shell,
+} from "electron";
 import { log, default as logger } from "electron-log";
 import ElectronStore from "electron-store";
 import unhandled from "electron-unhandled";
@@ -21,11 +30,13 @@ import {
   APP_INTERNAL_HOST,
   APP_INTERNAL_PORT,
   APP_PROTOCOL_NAME,
+  STORE_HASS_URL,
 } from "../shared/constants";
 import { HassConnection } from "./hass/hassConnection";
 import { injectStyleableSystemPreferences } from "./helpers/injectStylableSystemPreferences";
 import { isMac } from "./helpers/osPlatform";
 import { resolveHtmlPath } from "./helpers/resolveHtmlPath";
+import { store } from "./store";
 
 class AppUpdater {
   constructor() {
@@ -62,6 +73,8 @@ const installExtensions = async () => {
 const MAIN_WINDOW_START_URL = resolveHtmlPath(
   `${MAIN_WINDOW_VITE_NAME}/index.html`,
 );
+
+const TRAY_ICON_PATH = path.resolve(`${__dirname}/../../assets/tray.png`);
 
 const createWindow = async () => {
   if (isDebug) {
@@ -113,11 +126,20 @@ const createWindow = async () => {
   const startUrl = MAIN_WINDOW_START_URL;
   mainWindow.loadURL(startUrl);
 
+  mainWindow.on("close", (event) => {
+    event.preventDefault();
+    mainWindow.hide();
+    mainWindow.setBackgroundMaterial("mica");
+  });
+
   mainWindow.on("ready-to-show", () => {
     if (process.env.START_MINIMIZED) {
       mainWindow.minimize();
     } else {
-      mainWindow.show();
+      const knowsHass = store.get(STORE_HASS_URL);
+      if (!knowsHass) {
+        mainWindow.show();
+      }
     }
   });
 
@@ -216,6 +238,7 @@ if (isMac) {
 
 function focusMainWindow() {
   if (mainWindow.isMinimized()) mainWindow.restore();
+  mainWindow.show();
   mainWindow.focus();
 }
 
@@ -283,3 +306,28 @@ function handleProtocolUrl(url: string) {
       );
   }
 }
+
+export let tray: Tray = null;
+
+app.whenReady().then(() => {
+  tray = new Tray(TRAY_ICON_PATH);
+  const contextMenu = Menu.buildFromTemplate([
+    { label: "Quit", click: () => process.exit(1) },
+  ]);
+
+  tray.setContextMenu(contextMenu);
+  tray.setToolTip("This is my application.");
+  tray.on("click", async (event, tray, cursor) => {
+    const offset = 10;
+    const mainWindowBounds = mainWindow.getBounds();
+    const display = screen.getDisplayMatching(tray);
+
+    mainWindow.setPosition(
+      display.bounds.width - mainWindowBounds.width - offset,
+      tray.y - mainWindowBounds.height - offset,
+    );
+
+    focusMainWindow();
+    // mainWindow.setBackgroundMaterial("acrylic");
+  });
+});

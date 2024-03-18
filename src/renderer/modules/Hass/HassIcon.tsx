@@ -4,10 +4,21 @@ import { HassEntity } from "home-assistant-js-websocket";
 import { getEntityDomain } from "./getEntityDomain";
 import { hassIcons } from "./hassIcons";
 
-export function HassIcon({ entity }: { entity: HassEntity }) {
+export function HassIcon({
+  entity,
+  iconName,
+}: {
+  entity?: HassEntity;
+  iconName?: string;
+}) {
   return (
     <Icon
-      path={hassIcons[entity.attributes.icon] || defaultIconForDomain(entity)}
+      style={{ marginBottom: "-5px" }}
+      path={
+        entity
+          ? hassIcons[entity.attributes.icon] || defaultIconForDomain(entity)
+          : hassIcons[iconName]
+      }
       size="var(--ehs-font-size-icon)"
     />
   );
