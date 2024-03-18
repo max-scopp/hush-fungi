@@ -1,6 +1,4 @@
 # HushFungi
 
-<div style="display: flex">
-<img src="screenshots/light.png">
-<img src="screenshots/dark.png">
-</div>
+<img style="width: 50%" src="screenshots/light.png">
+<img style="width: 50%" src="screenshots/dark.png">
