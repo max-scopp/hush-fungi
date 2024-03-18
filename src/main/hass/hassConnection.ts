@@ -1,5 +1,5 @@
 import { BrowserWindow, IpcMainEvent, ipcMain } from "electron";
-import { log } from "electron-log";
+import Logger, { log } from "electron-log";
 import {
   Auth,
   Connection,
@@ -43,8 +43,11 @@ export class HassConnection {
       );
     }
 
-    this.recoverAsync().catch(log);
+    this.reconnect();
+    ipcMain.on(channels.HASS_RECONNECT, () => this.reconnect());
   }
+
+  private readonly reconnect = () => this.recoverAsync().catch(Logger.error);
 
   static _phase: HassConnectionPhase = "unknown";
 

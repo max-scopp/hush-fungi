@@ -25,7 +25,7 @@ export function Home() {
       {contextHolder}
       <Segmented
         value={page}
-        style={{ marginBottom: 8, position: "sticky", top: "0", zIndex: 100 }}
+        // style={{ marginBottom: 8, position: "sticky", top: "0", zIndex: 100 }}
         onChange={(value) => setPage(value as Lace)}
         options={[...laces]}
       />

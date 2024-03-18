@@ -11,6 +11,7 @@ export const channels = {
 
   // hass channels
   HASS_RECONNECT: "hass_reconnect",
+  HASS_RECONNECTED: "hass_reconnected",
   HASS_CALL_SERVICE: "hass_call_service",
   HASS_RUN_TEMPLATE: "hass_run_template",
 

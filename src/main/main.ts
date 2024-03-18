@@ -79,20 +79,25 @@ const createWindow = async () => {
 
   mainWindow = new BrowserWindow({
     show: false,
+    maxWidth: 600,
+    maxHeight: 1_000,
     width: 460,
     height: 728,
     icon: getAssetPath("icon.png"),
-    // titleBarOverlay: true,
-    vibrancy: "content",
+    titleBarOverlay: true,
+    titleBarStyle: "hiddenInset",
+    vibrancy: "fullscreen-ui",
+    maximizable: false,
+    minimizable: false,
+    fullscreenable: false,
+
     // frame: false,
     autoHideMenuBar: true,
     backgroundMaterial: "mica",
-    minimizable: false,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
-      webSecurity: false,
+      // webSecurity: false,
       nodeIntegration: true,
-      enableBlinkFeatures: "OverlayScrollbars",
       // enableRemoteModule: true,
       // preload: app.isPackaged
       //   ? path.join(__dirname, "preload.js")
@@ -234,8 +239,8 @@ const server = http.createServer((req, res) => {
 
   if (
     url.searchParams.has("auth_callback") &&
-    url.searchParams.has("state") &&
-    url.searchParams.has("storeToken")
+    url.searchParams.has("code") &&
+    url.searchParams.has("state")
   ) {
     const startUrl = MAIN_WINDOW_START_URL;
     const params = /(\?.*$)/.exec(req.url)[0];
@@ -245,6 +250,7 @@ const server = http.createServer((req, res) => {
     mainWindow.webContents.loadURL(redirected);
     res.end(`<head>
     <meta http-equiv="Refresh" content="0; URL=hush-fungi://focus" />
+    <script>setTimeout(() => close(), 300)</script>
   </head><body>You're done!</body>`);
     return;
   }

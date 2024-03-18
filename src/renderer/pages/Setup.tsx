@@ -1,20 +1,71 @@
 import { Alert, Button, Flex, Input, Result } from "antd";
-import { getAuth } from "home-assistant-js-websocket";
+import { log } from "electron-log";
+import { createLongLivedTokenAuth, getAuth } from "home-assistant-js-websocket";
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { DEFAULT_HASS_URL, STORE_HASS_URL } from "../../shared/constants";
+import { create } from "zustand";
+import {
+  DEFAULT_HASS_URL,
+  STORE_HASS_AUTH,
+  STORE_HASS_URL,
+} from "../../shared/constants";
 import { EmojiIcon } from "../components/EmojiIcon";
+
+const hassUrl = String(
+  window.electron.storage.get(STORE_HASS_URL) ?? DEFAULT_HASS_URL,
+);
+const url = new URL(location.href);
+const initialState = {
+  isAuthCallback: url.searchParams.has("auth_callback"),
+  handledAuthCallback: false as boolean,
+} as const;
+
+type AuthCallbackState = typeof initialState;
+
+const useAuthCallback = create<AuthCallbackState>((set) => {
+  async function handleCallbackAsync() {
+    log(`Trying authentication against instance ${hassUrl}`);
+
+    const retrievedAuth = await authenticateHass(() =>
+      set({ handledAuthCallback: true }),
+    );
+
+    const long = createLongLivedTokenAuth(hassUrl, retrievedAuth.accessToken);
+    await long.refreshAccessToken();
+    log("hass: long lived token refreshed");
+  }
+
+  if (initialState.isAuthCallback) {
+    handleCallbackAsync();
+  }
+
+  return initialState;
+});
+
+function authenticateHass(onSave?: () => void) {
+  return getAuth({
+    hassUrl,
+    clientId: window.electron.remote.getGlobal("localServerAddress"),
+    redirectUrl: window.electron.remote.getGlobal("localServerAddress"),
+    saveTokens: (data) => {
+      window.electron.storage.set(STORE_HASS_AUTH, data);
+      window.hass.reconnect();
+      onSave?.();
+    },
+  });
+}
 
 export function Setup() {
   const navigate = useNavigate();
-  debugger;
-
-  const [hassUrl, setHassUrl] = useState(DEFAULT_HASS_URL);
+  const [userHassUrl, setUserHassUrl] = useState(hassUrl);
   const [isValidUrl, setIsValidUrl] = useState(true);
 
+  const ac = useAuthCallback();
+
+  // double check url before assuming user is correct
   useEffect(() => {
     try {
-      const parsedUrl = new URL(hassUrl);
+      const parsedUrl = new URL(userHassUrl);
       if (
         // must be http(s) and include a tld
         ["http:", "https:"].includes(parsedUrl.protocol) &&
@@ -28,19 +79,22 @@ export function Setup() {
     } catch (error) {
       setIsValidUrl(false);
     }
-  }, [hassUrl]);
+  }, [userHassUrl]);
 
   const handleHassUrlAndRunFirstAuth = useCallback(async () => {
-    window.electron.storage.set(STORE_HASS_URL, hassUrl);
+    window.electron.storage.set(STORE_HASS_URL, userHassUrl);
 
-    const retrievedAuth = await getAuth({
-      hassUrl,
-      clientId: window.electron.remote.getGlobal("localServerAddress"),
-      redirectUrl: window.electron.remote.getGlobal("localServerAddress"),
-    });
-
-    window.hass.reconnect();
+    await authenticateHass();
   }, []);
+
+  if (ac.isAuthCallback) {
+    if (ac.handledAuthCallback) {
+      setTimeout(() => navigate("/"), 300);
+      return <Result status="success" title="Connected!"></Result>;
+    }
+
+    return <Result status="info" title="Connecting..."></Result>;
+  }
 
   return (
     <Result
@@ -60,8 +114,8 @@ export function Setup() {
         <Input
           style={{ flex: 1 }}
           placeholder="Example"
-          defaultValue={hassUrl}
-          onChange={(event) => setHassUrl(event.currentTarget.value)}
+          defaultValue={userHassUrl}
+          onChange={(event) => setUserHassUrl(event.currentTarget.value)}
         />
 
         <Button

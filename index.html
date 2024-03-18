@@ -1,10 +1,16 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
     <meta charset="UTF-8" />
     <title>Hello World!</title>
     <!-- allow native webview elements (such as scrollbars) will adapt to the color scheme -->
-    <meta name="color-scheme" content="light dark">
+    <meta name="color-scheme" content="light dark" />
+    <script>
+      document.documentElement.setAttribute(
+        "platform",
+        window.electron.platform,
+      );
+    </script>
   </head>
   <body>
     <div id="root"></div>

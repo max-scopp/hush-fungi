@@ -8,10 +8,13 @@ import {
   HassServices,
 } from "home-assistant-js-websocket";
 import { StateCreator } from "zustand";
+import { browserEvents } from "../shared/browserEvents";
 import { Channel, channels } from "../shared/channels";
+import { HassConnectionPhase } from "./hass/HassConnectionPhase";
 import { store } from "./store";
 
 const electronHandler = {
+  platform: process.platform,
   storage: {
     get(key: string) {
       return store.get(key);
@@ -65,7 +68,13 @@ type EntitiesState = {
   entities: HassEntities;
 };
 
-const lazy = (work: () => Promise<any>) => work();
+const phase: HassConnectionPhase = getGlobal("hassConnectionPhase");
+
+const lazySync = (work: () => Promise<any>) => {
+  if (phase === "connected") {
+    work();
+  }
+};
 
 const hassStoreCreator: StateCreator<EntitiesState> = (setState) => {
   //#region config
@@ -73,7 +82,7 @@ const hassStoreCreator: StateCreator<EntitiesState> = (setState) => {
     setState({ config });
   });
 
-  lazy(async () => {
+  lazySync(async () => {
     const config = await ipcRenderer.invoke(channels.HASS_GET_CONFIG);
     setState({ config });
   });
@@ -84,7 +93,7 @@ const hassStoreCreator: StateCreator<EntitiesState> = (setState) => {
     setState({ services });
   });
 
-  lazy(async () => {
+  lazySync(async () => {
     const services = await ipcRenderer.invoke(channels.HASS_GET_SERVICES);
     setState({ services });
   });
@@ -95,7 +104,7 @@ const hassStoreCreator: StateCreator<EntitiesState> = (setState) => {
     setState({ entities });
   });
 
-  lazy(async () => {
+  lazySync(async () => {
     const entities = await ipcRenderer.invoke(channels.HASS_GET_ENTITIES);
     setState({ entities });
   });
@@ -107,6 +116,10 @@ const hassStoreCreator: StateCreator<EntitiesState> = (setState) => {
     entities: {},
   };
 };
+
+ipcRenderer.on(channels.HASS_RECONNECTED, () =>
+  dispatchEvent(new CustomEvent(browserEvents.reconnected)),
+);
 
 const hassHandler = {
   reconnect() {
