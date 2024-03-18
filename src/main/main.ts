@@ -16,6 +16,7 @@ import {
   app,
   dialog,
   ipcMain,
+  nativeTheme,
   screen,
   shell,
 } from "electron";
@@ -98,18 +99,14 @@ const createWindow = async () => {
     height: 728,
     icon: getAssetPath("icon.png"),
     titleBarStyle: "hidden",
-    titleBarOverlay: {
-      color: "black",
-      symbolColor: "white",
-      height: 30,
-    },
+    titleBarOverlay: getTitlebarOverlayStyles(),
     vibrancy: "fullscreen-ui",
     maximizable: false,
     minimizable: false,
     fullscreenable: false,
 
     autoHideMenuBar: true,
-    backgroundMaterial: "mica",
+    backgroundMaterial: "acrylic",
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       // webSecurity: false,
@@ -123,13 +120,16 @@ const createWindow = async () => {
 
   Remote.enable(mainWindow.webContents);
 
+  nativeTheme.on("updated", () => {
+    mainWindow.setTitleBarOverlay(getTitlebarOverlayStyles());
+  });
+
   const startUrl = MAIN_WINDOW_START_URL;
   mainWindow.loadURL(startUrl);
 
   mainWindow.on("close", (event) => {
     event.preventDefault();
     mainWindow.hide();
-    mainWindow.setBackgroundMaterial("mica");
   });
 
   mainWindow.on("ready-to-show", () => {
@@ -234,6 +234,20 @@ if (isMac) {
     // Create mainWindow, load the rest of the app, etc...
     whenReadyCreateMainWindow();
   }
+}
+
+function getTitlebarOverlayStyles(): Electron.TitleBarOverlay {
+  return nativeTheme.shouldUseDarkColors
+    ? {
+        color: "black",
+        symbolColor: "white",
+        height: 30,
+      }
+    : {
+        color: "white",
+        symbolColor: "black",
+        height: 30,
+      };
 }
 
 function focusMainWindow() {
