@@ -1,4 +1,4 @@
-import { Card } from "antd";
+import { Card as AntdCard } from "antd";
 import { log } from "electron-log";
 import { HassEntity } from "home-assistant-js-websocket";
 import { ReactNode } from "react";
@@ -9,7 +9,7 @@ const tileDetailMap: { [detail: string]: (entity: HassEntity) => ReactNode } = {
   light: (entity: HassEntity) => <LightTileDetails entity={entity} />,
 };
 
-export function Tile({
+export function Card({
   entity,
   enforcedTileDetail,
 }: {
@@ -20,9 +20,9 @@ export function Tile({
     tileDetailMap[enforcedTileDetail ?? detectTileDetail(entity)];
 
   return (
-    <Card size="small" onClick={() => log(entity)} bordered={false}>
+    <AntdCard size="small" onClick={() => log(entity)} bordered={false}>
       {tileDetail(entity)}
-    </Card>
+    </AntdCard>
   );
 }
 

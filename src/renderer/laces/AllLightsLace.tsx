@@ -1,7 +1,7 @@
 import { Flex } from "antd";
+import { Card } from "../components/Card";
 import { InSafespace } from "../components/InSafespace";
 import { RoomTitle } from "../components/RoomTitle";
-import { Tile } from "../components/Tile";
 import { filterEntities } from "../modules/Common/filterEntities";
 import { useAreas } from "../modules/Hass/useAreas";
 import { useHassStore } from "../modules/Hass/useHassStore";
@@ -29,7 +29,7 @@ export function AllLightsLace() {
             <InSafespace>
               <Flex vertical gap={10}>
                 {areaEntitiesKv.map(([key, entity]) => (
-                  <Tile entity={entity} key={key} />
+                  <Card entity={entity} key={key} />
                 ))}
               </Flex>
             </InSafespace>
