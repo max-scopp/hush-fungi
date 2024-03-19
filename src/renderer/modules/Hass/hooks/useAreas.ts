@@ -1,6 +1,6 @@
 import { HassEntities } from "home-assistant-js-websocket";
 import { suspend } from "suspend-react";
-import { filterObject } from "../Common/filterObject";
+import { filterObject } from "../../Common/filterObject";
 
 type AreaWithEntityIds = {
   id: string;

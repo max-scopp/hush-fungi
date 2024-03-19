@@ -11,24 +11,14 @@
  *
  * https://electronjs.org/docs/tutorial/security
  *
- * To enable Node.js integration in this file, open up `main.ts` and enable the `nodeIntegration`
- * flag:
- *
- * ```
- *  // Create the browser window.
- *  mainWindow = new BrowserWindow({
- *    width: 800,
- *    height: 600,
- *    webPreferences: {
- *      nodeIntegration: true
- *    }
- *  });
- * ```
+ * Currently, the Node.js integration is enabled for @electron/remote to work,
+ * however, I want to move away from it but haven't been arsed to make all the changed
+ * for it yet.
  */
 
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { App } from "./App";
+import { App } from "./components/App";
 import "./global.scss";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(

@@ -1,4 +1,3 @@
-@import "antd-overwrites";
 @import "overlayscrollbars/overlayscrollbars.css";
 
 :root {
@@ -29,6 +28,7 @@
   }
 }
 
+// smoothly fade out scroll contents on the top
 [data-overlayscrollbars-contents] {
   mask: linear-gradient(
     180deg,
@@ -37,6 +37,7 @@
     rgba(0, 0, 0, 1) calc(var(--titlebar-height)),
     black
   );
+  // // scrapped fadeout for both sides - must use easing gradient otherwise it's ugly af.
   // mask: linear-gradient(
   //   180deg,
   //   transparent,
@@ -47,11 +48,13 @@
 }
 
 .os-scrollbar {
+  // TODO: This is currently more apple-ish, make a more windows conforming scrollbar
   --os-size: 8px;
   --os-padding-perpendicular: 2px;
   --os-padding-axis: 0px;
   --os-track-border-radius: 10px;
 
+  // dont let the scrollbar clash into the frame border
   padding-bottom: 8px;
   padding-top: calc(var(--titlebar-height) + 4px);
 }

@@ -109,7 +109,7 @@ const createWindow = async () => {
     backgroundMaterial: "acrylic",
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
-      // webSecurity: false,
+      // must be `true` for @electron/remote cant move away from it yet.
       nodeIntegration: true,
       // enableRemoteModule: true,
       // preload: app.isPackaged

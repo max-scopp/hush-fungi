@@ -9,7 +9,7 @@ import {
   STORE_HASS_AUTH,
   STORE_HASS_URL,
 } from "../../shared/constants";
-import { EmojiIcon } from "../components/EmojiIcon";
+import { EmojiIcon } from "../modules/Common/components/EmojiIcon";
 
 const hassUrl = String(
   window.electron.storage.get(STORE_HASS_URL) ?? DEFAULT_HASS_URL,

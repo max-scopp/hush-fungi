@@ -1,7 +1,10 @@
 import { HassEntities } from "home-assistant-js-websocket";
-import { filterObject } from "../Common/filterObject";
-import { getEntityDomain } from "./getEntityDomain";
+import { filterObject } from "../../Common/filterObject";
+import { getEntityDomain } from "../helpers/getEntityDomain";
 
+/**
+ * @see https://www.home-assistant.io/integrations/#helper
+ */
 export function useHelpers() {
   return {
     getGroups(domain: string, entities: HassEntities) {

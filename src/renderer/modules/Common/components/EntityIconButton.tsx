@@ -1,9 +1,9 @@
 import { Badge, Button } from "antd";
 import { HassEntity } from "home-assistant-js-websocket";
-import { HassIcon } from "../modules/Hass/HassIcon";
+import { HassIcon } from "../../Hass/components/HassIcon";
 
 import { ExclamationCircleFilled } from "@ant-design/icons";
-import { hassStates } from "../modules/Hass/hassStates";
+import { hassStates } from "../../Hass/helpers/hassStates";
 import styles from "./EntityIconButton.module.scss";
 
 export function EntityIconButton({

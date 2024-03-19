@@ -1,10 +1,10 @@
-import { RouteObject, createMemoryRouter, redirect } from "react-router-dom";
+import { createMemoryRouter, redirect } from "react-router-dom";
 import { HassConnectionPhase } from "../main/hass/HassConnectionPhase";
 import { Home } from "./pages/Home";
 import { NoRoute } from "./pages/NoRoute";
 import { Setup } from "./pages/Setup";
 
-const routes: RouteObject[] = [
+export const router = createMemoryRouter([
   {
     index: true,
     element: <Home />,
@@ -28,6 +28,4 @@ const routes: RouteObject[] = [
   },
   { path: "/setup", element: <Setup /> },
   { path: "*", element: <NoRoute /> },
-];
-
-export const router = createMemoryRouter(routes);
+]);

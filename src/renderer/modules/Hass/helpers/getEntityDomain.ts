@@ -1,5 +1,5 @@
 import { HassEntity } from "home-assistant-js-websocket";
-import { Domain } from "./Domain";
+import { Domain } from "../types/Domain";
 
 const REGEXP_MATCH_DOMAIN = /^[^.]+/;
 

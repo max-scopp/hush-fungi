@@ -2,10 +2,11 @@ import { Flex } from "antd";
 import Meta from "antd/es/card/Meta";
 import { HassEntity } from "home-assistant-js-websocket";
 import { useCallback } from "react";
-import { EntityIconButton } from "../EntityIconButton";
-import { Slider } from "../Slider";
+import { CardDetailsProps } from "../../Card/types/CardDetailsProps";
+import { EntityIconButton } from "../../Common/components/EntityIconButton";
+import { Slider } from "../../Slider/components/Slider";
 
-export function LightTileDetails({ entity }: { entity: HassEntity }) {
+export function LightEntityCardDetails({ entity }: CardDetailsProps) {
   const handleIconStateToggle = useCallback(
     (entity: HassEntity) => {
       window.hass.callService(

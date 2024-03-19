@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useLocalStorage } from "usehooks-ts";
 import { AllEntitiesLace } from "../laces/AllEntitiesLace";
 import { AllLightsLace } from "../laces/AllLightsLace";
-import { HassIcon } from "../modules/Hass/HassIcon";
+import { HassIcon } from "../modules/Hass/components/HassIcon";
 import styles from "./Home.module.scss";
 
 const laces = ["all", "lamps"] as const;

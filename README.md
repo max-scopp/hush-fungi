@@ -66,6 +66,11 @@ Contributions are welcome! If you'd like to contribute to HushFungi, please foll
 - Make your changes and ensure that they are well-tested.
 - Submit a pull request detailing your changes.
 
-### License
+### Debugging
+
+In VSC, just press F5.
+Use VSC for node.js debugging, the web inspector for the renderer.
+
+## License
 
 MIT

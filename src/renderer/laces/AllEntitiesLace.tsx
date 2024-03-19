@@ -1,7 +1,7 @@
 import { Flex, List, Tooltip } from "antd";
 import { log } from "electron-log";
-import { HassIcon } from "../modules/Hass/HassIcon";
-import { useHassStore } from "../modules/Hass/useHassStore";
+import { HassIcon } from "../modules/Hass/components/HassIcon";
+import { useHassStore } from "../modules/Hass/internal/useHassStore";
 
 export function AllEntitiesLace() {
   const { entities } = useHassStore();

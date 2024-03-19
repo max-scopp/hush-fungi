@@ -33,6 +33,9 @@ const electronHandler = {
     },
   },
   remote: {
+    /**
+     * @deprecated I want to move away from @electron/remote
+     */
     getGlobal(globalName: string) {
       const result = getGlobal(globalName);
       if (JSON.stringify(result).length > 500) {

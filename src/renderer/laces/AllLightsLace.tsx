@@ -1,10 +1,10 @@
 import { Flex } from "antd";
-import { Card } from "../components/Card";
-import { InSafespace } from "../components/InSafespace";
-import { RoomTitle } from "../components/RoomTitle";
+import { Card } from "../modules/Card/components/Card";
+import { InSafespace } from "../modules/Common/components/InSafespace";
+import { RoomTitle } from "../modules/Common/components/RoomTitle";
 import { filterEntities } from "../modules/Common/filterEntities";
-import { useAreas } from "../modules/Hass/useAreas";
-import { useHassStore } from "../modules/Hass/useHassStore";
+import { useAreas } from "../modules/Hass/hooks/useAreas";
+import { useHassStore } from "../modules/Hass/internal/useHassStore";
 
 export function AllLightsLace() {
   const lights = useHassStore((state) =>
@@ -39,9 +39,3 @@ export function AllLightsLace() {
     </Flex>
   );
 }
-
-// function groupByRooms(areas: any, entities: HassEntities)  {
-//   const rooms = {}
-
-//   Object.values(entities).forEach(entity => rooms[entity.context.])
-// }

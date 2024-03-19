@@ -5,12 +5,12 @@ import { OverlayScrollbarsComponent } from "overlayscrollbars-react";
 import { Suspense, useState } from "react";
 import { RouterProvider } from "react-router-dom";
 import { useMediaQuery } from "usehooks-ts";
-import { channels } from "../shared/channels";
+import { channels } from "../../shared/channels";
+import { buildTheme } from "../buildTheme";
+import { router } from "../router";
 import styles from "./App.module.scss";
-import { buildTheme } from "./buildTheme";
-import { DebugHint } from "./components/DebugHint";
-import { Titlebar } from "./components/Titlebar";
-import { router } from "./router";
+import { DebugHint } from "./DebugHint";
+import { Titlebar } from "./Titlebar";
 
 export function App() {
   const isDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
