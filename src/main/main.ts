@@ -5,6 +5,7 @@ import unhandled, { logError } from "electron-unhandled";
 import { configureSingleInstance } from "./boot/configureSingleInstance";
 import { installExtensions } from "./dev/installExtensions";
 import { HassConnection } from "./hass/hassConnection";
+import { configureMenu } from "./menu/menu";
 import { configureProtocol } from "./protocol/handleProtocolUrl";
 import { createAppServer } from "./server/server";
 import { configureGlobalShortcuts } from "./shortcuts/shortcuts";
@@ -30,8 +31,9 @@ async function main() {
 
   await configureSingleInstance();
   await configureProtocol();
-  await configureAutoUpdater();
   await configureGlobalShortcuts();
+  await configureMenu();
+  await configureAutoUpdater();
 
   await Promise.all([
     createAutoUpdater(),

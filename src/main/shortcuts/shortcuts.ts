@@ -17,10 +17,6 @@ export async function configureGlobalShortcuts() {
   console.log(globalShortcut.isRegistered(APP_GLOBAL_SHORTCUT));
 
   app.on("will-quit", () => {
-    // Unregister a shortcut.
     globalShortcut.unregister(APP_GLOBAL_SHORTCUT);
-
-    // Unregister all shortcuts.
-    globalShortcut.unregisterAll();
   });
 }

@@ -10,6 +10,7 @@ export function buildDefaultWindowOptions(
   //   mainWindow.setTitleBarOverlay(getTitlebarOverlayStyles());
   // });
   return {
+    fullscreenable: false,
     autoHideMenuBar: true,
     center: true,
     show: false,

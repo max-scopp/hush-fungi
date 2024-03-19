@@ -26,7 +26,9 @@ export async function createTray() {
     // TODO: Can I use floating-ui for this computation? Or similiar library?
 
     focusMainWindow("tray", {
-      x: display.bounds.width - mainWindowBounds.width - offset,
+      x: osPlatform.isMac
+        ? tray.x + tray.width / 2 - mainWindowBounds.width / 2
+        : display.bounds.width - mainWindowBounds.width - offset,
       y: tray.y - mainWindowBounds.height - offset,
     });
     // mainWindow.setBackgroundMaterial("acrylic");

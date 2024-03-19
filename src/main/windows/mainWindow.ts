@@ -86,6 +86,7 @@ export const createMainWindow = async () => {
   mainWindow = new BrowserWindow({
     ...buildDefaultWindowOptions("temporary"),
     frame: false,
+    titleBarStyle: "default",
     titleBarOverlay: false,
 
     maximizable: false,
@@ -126,11 +127,6 @@ export const createMainWindow = async () => {
     hideWindow();
   });
 
-  mainWindow.on("close", (event) => {
-    event.preventDefault();
-    mainWindow.blur();
-  });
-
   mainWindow.on("ready-to-show", () => {
     updateMainWindowRect(mainWindow.getBounds());
     if (process.env.START_MINIMIZED) {
@@ -168,6 +164,6 @@ export const createMainWindow = async () => {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
     if (mainWindow === null) createMainWindow();
-    focusMainWindow();
+    focusMainWindow("protocol");
   });
 };
