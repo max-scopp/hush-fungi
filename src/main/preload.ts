@@ -13,8 +13,31 @@ import { Channel, channels } from "../shared/channels";
 import { HassConnectionPhase } from "./hass/HassConnectionPhase";
 import { store } from "./store";
 
+ipcRenderer.on(channels.WANTS_WINDOW_HIDE, () => {
+  log("wants window to hide");
+  window.document.documentElement.setAttribute("inactive", "");
+  // this is a bit wonky,
+  // but the combination of setTimeout() 1 and requestAnimationFrame()
+  // makes it more consistent that the next time the window is shown,
+  // the first frame will NOT be the last frame before hiding.
+  setTimeout(() => {
+    requestAnimationFrame(() =>
+      ipcRenderer.send(channels.WANTS_WINDOW_HIDE, getCurrentWindow().id),
+    );
+  }, 1);
+});
+
+window.addEventListener("focus", () => {
+  window.document.documentElement.removeAttribute("inactive");
+});
+
 const electronHandler = {
   platform: process.platform,
+  window: {
+    blur() {
+      getCurrentWindow().blur();
+    },
+  },
   storage: {
     get(key: string) {
       return store.get(key);

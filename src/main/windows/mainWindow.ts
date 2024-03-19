@@ -1,18 +1,90 @@
 import { enable } from "@electron/remote/main";
-import { BrowserWindow, app, nativeTheme, shell } from "electron";
-import path from "path";
+import {
+  BrowserWindow,
+  Rectangle,
+  app,
+  ipcMain,
+  nativeTheme,
+  shell,
+} from "electron";
+import { log } from "electron-log";
+import { channels } from "../../shared/channels";
 import { STORE_HASS_URL } from "../../shared/constants";
-import { MAIN_WINDOW_START_URL } from "../constants";
+import {
+  APP_STORE_TRAY_RECT,
+  APP_STORE_USER_RECT,
+  MAIN_WINDOW_START_URL,
+} from "../constants";
 import { getTitlebarOverlayStyles } from "../helpers/getTitlebarOverlayStyles";
 import { injectStyleableSystemPreferences } from "../helpers/injectStylableSystemPreferences";
 import { store } from "../store";
+import { buildDefaultWindowOptions } from "./buildDefaultWindowOptions";
 
 export let mainWindow: BrowserWindow = null;
+type MainWindowMode = "user" | "tray";
 
-export function focusMainWindow() {
+const windowState = {
+  lastUserRect: store.get(APP_STORE_USER_RECT) ?? {},
+  lastTrayRect: store.get(APP_STORE_TRAY_RECT) ?? {},
+  mode: "user" as MainWindowMode,
+};
+
+export function updateMainWindowRect(rect: Partial<Rectangle>) {
+  switch (windowState.mode) {
+    case "user": {
+      Object.assign(windowState.lastUserRect, rect);
+      store.set(APP_STORE_USER_RECT, windowState.lastUserRect);
+      return;
+    }
+    case "tray": {
+      Object.assign(windowState.lastTrayRect, rect);
+      store.set(APP_STORE_TRAY_RECT, windowState.lastTrayRect);
+      return;
+    }
+  }
+}
+
+export function updateMainWindowMode(newMode: MainWindowMode) {
+  windowState.mode = newMode;
+
+  switch (windowState.mode) {
+    case "tray":
+      mainWindow.setBounds(windowState.lastTrayRect, true);
+      break;
+    case "user":
+      mainWindow.setBounds(windowState.lastUserRect, true);
+      break;
+  }
+}
+
+export function focusMainWindow(
+  origin: "tray" | "protocol" | "shortcut",
+  withRect?: Partial<Rectangle>,
+) {
   if (mainWindow.isMinimized()) {
     mainWindow.restore();
   }
+
+  let futureMode: MainWindowMode = "user";
+
+  switch (origin) {
+    case "protocol":
+    case "shortcut": {
+      futureMode = "user";
+      break;
+    }
+    case "tray": {
+      futureMode = "tray";
+      break;
+    }
+  }
+
+  if (withRect) {
+    updateMainWindowRect(withRect);
+  }
+
+  log(`focus as ${futureMode}`);
+  updateMainWindowMode(futureMode);
 
   mainWindow.show();
   mainWindow.focus();
@@ -21,39 +93,19 @@ export function focusMainWindow() {
 export const createMainWindow = async () => {
   await app.whenReady();
 
-  const RESOURCES_PATH = app.isPackaged
-    ? path.join(process.resourcesPath, "assets")
-    : path.join(__dirname, "../../assets");
-
-  const getAssetPath = (...paths: string[]): string => {
-    return path.join(RESOURCES_PATH, ...paths);
-  };
-
   mainWindow = new BrowserWindow({
-    show: false,
-    maxWidth: 600,
-    maxHeight: 1_000,
-    width: 460,
-    height: 728,
-    icon: getAssetPath("icon.png"),
-    titleBarStyle: "hidden",
-    titleBarOverlay: getTitlebarOverlayStyles(),
-    vibrancy: "fullscreen-ui",
+    ...buildDefaultWindowOptions("long"),
+    frame: false,
+    titleBarOverlay: false,
+
     maximizable: false,
     minimizable: false,
-    fullscreenable: false,
 
-    autoHideMenuBar: true,
-    backgroundMaterial: "acrylic",
-    webPreferences: {
-      preload: path.join(__dirname, "preload.js"),
-      // must be `true` for @electron/remote cant move away from it yet.
-      nodeIntegration: true,
-      // enableRemoteModule: true,
-      // preload: app.isPackaged
-      //   ? path.join(__dirname, "preload.js")
-      //   : path.join(__dirname, "../../.erb/dll/preload.js"),
-    },
+    maxWidth: 600,
+    maxHeight: 1_000,
+
+    width: 460,
+    height: 728,
   });
 
   // TODO: Remove @electron/remote
@@ -65,12 +117,36 @@ export const createMainWindow = async () => {
 
   mainWindow.loadURL(MAIN_WINDOW_START_URL);
 
+  mainWindow.on("move", () => updateMainWindowRect(mainWindow.getBounds()));
+  mainWindow.on("resize", () => updateMainWindowRect(mainWindow.getBounds()));
+
+  //#region hide content when inactive for windows animations
+  ipcMain.on(channels.WANTS_WINDOW_HIDE, (event, windowId) => {
+    if (windowId === mainWindow.id) {
+      mainWindow.hide();
+    }
+  });
+
+  const hideWindow = async () => {
+    mainWindow.webContents.send(channels.WANTS_WINDOW_HIDE);
+  };
+  //#endregion
+
+  mainWindow.on("blur", () => {
+    if (mainWindow.webContents.isDevToolsOpened()) {
+      return;
+    }
+
+    hideWindow();
+  });
+
   mainWindow.on("close", (event) => {
     event.preventDefault();
-    mainWindow.hide();
+    mainWindow.blur();
   });
 
   mainWindow.on("ready-to-show", () => {
+    updateMainWindowRect(mainWindow.getBounds());
     if (process.env.START_MINIMIZED) {
       mainWindow.minimize();
     } else {
@@ -82,10 +158,6 @@ export const createMainWindow = async () => {
   });
 
   injectStyleableSystemPreferences(mainWindow);
-
-  mainWindow.on("closed", () => {
-    mainWindow = null;
-  });
 
   // const menuBuilder = new MenuBuilder(mainWindow);
   // menuBuilder.buildMenu();

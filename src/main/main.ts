@@ -2,14 +2,14 @@ import Remote from "@electron/remote/main";
 import { default as ElectronLog } from "electron-log";
 import ElectronStore from "electron-store";
 import unhandled, { logError } from "electron-unhandled";
-import { configureAutoUpdater } from "./boot/configureAutoUpdater";
-import { configureProtocol } from "./boot/configureProtocol";
 import { configureSingleInstance } from "./boot/configureSingleInstance";
 import { installExtensions } from "./dev/installExtensions";
 import { HassConnection } from "./hass/hassConnection";
+import { configureProtocol } from "./protocol/handleProtocolUrl";
 import { createAppServer } from "./server/server";
+import { configureGlobalShortcuts } from "./shortcuts/shortcuts";
 import { createTray } from "./tray";
-import { createAutoUpdater } from "./updates/updater";
+import { configureAutoUpdater, createAutoUpdater } from "./updates/updater";
 import { createMainWindow } from "./windows/mainWindow";
 
 /**
@@ -31,6 +31,7 @@ async function main() {
   await configureSingleInstance();
   await configureProtocol();
   await configureAutoUpdater();
+  await configureGlobalShortcuts();
 
   await Promise.all([
     createAutoUpdater(),

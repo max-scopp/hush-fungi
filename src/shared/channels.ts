@@ -2,6 +2,7 @@
  * Shared list of channels used for ipc talk
  */
 export const channels = {
+  WANTS_WINDOW_HIDE: "ehs_wants_window_hide",
   SYSTEM_PREFERENCES_CHANGED: "ehs_system_preferences_changed",
 
   HASS_RECONNECT: "hass_reconnect",

@@ -48,15 +48,29 @@
 }
 
 .os-scrollbar {
-  // TODO: This is currently more apple-ish, make a more windows conforming scrollbar
-  --os-size: 8px;
-  --os-padding-perpendicular: 2px;
+  --os-size: 11px;
+  --os-padding-perpendicular: 3px;
   --os-padding-axis: 0px;
   --os-track-border-radius: 10px;
+
+  [platform="win32"] & {
+    --os-size: 10px;
+    --os-padding-perpendicular: 4px;
+  }
 
   // dont let the scrollbar clash into the frame border
   padding-bottom: 8px;
   padding-top: calc(var(--titlebar-height) + 4px);
+
+  transition: background-color ease-out 240ms;
+
+  &:hover {
+    background: rgb(0 0 0 / 8%);
+
+    @media screen and (prefers-color-scheme: dark) {
+      background: rgb(255 255 255 / 8%);
+    }
+  }
 }
 
 body {
@@ -71,6 +85,13 @@ body {
   user-select: none;
 
   overflow: hidden;
+
+  transition: opacity ease-out 80ms;
+
+  [inactive] & {
+    opacity: 0;
+    transition-duration: 0ms;
+  }
 }
 
 html,
