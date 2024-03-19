@@ -1,5 +1,3 @@
-import { MakerDeb } from "@electron-forge/maker-deb";
-import { MakerRpm } from "@electron-forge/maker-rpm";
 import { MakerSquirrel } from "@electron-forge/maker-squirrel";
 import { MakerZIP } from "@electron-forge/maker-zip";
 import { FusesPlugin } from "@electron-forge/plugin-fuses";
@@ -13,10 +11,11 @@ const config: ForgeConfig = {
   },
   rebuildConfig: {},
   makers: [
-    new MakerSquirrel({}),
-    new MakerZIP({}, ["darwin"]),
-    new MakerRpm({}),
-    new MakerDeb({}),
+    new MakerSquirrel({}), // for windows, also creates installer
+    new MakerZIP({}, ["darwin"]), // for macOS app
+    // // The difficulty with linux are the different gui's available, I might want to support gnome someday.
+    // new MakerRpm({}),
+    // new MakerDeb({}),
   ],
   plugins: [
     new VitePlugin({
