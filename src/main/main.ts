@@ -266,6 +266,7 @@ function whenReadyCreateMainWindow() {
         // On macOS it's common to re-create a window in the app when the
         // dock icon is clicked and there are no other windows open.
         if (mainWindow === null) createWindow();
+        focusMainWindow();
       });
     })
     .catch(console.log);
@@ -325,11 +326,13 @@ export let tray: Tray = null;
 
 app.whenReady().then(() => {
   tray = new Tray(TRAY_ICON_PATH);
-  const contextMenu = Menu.buildFromTemplate([
-    { label: "Quit", click: () => process.exit(1) },
-  ]);
+  if (!isMac) {
+    const contextMenu = Menu.buildFromTemplate([
+      { label: "Quit", click: () => process.exit(1) },
+    ]);
 
-  tray.setContextMenu(contextMenu);
+    tray.setContextMenu(contextMenu);
+  }
   tray.setToolTip("This is my application.");
   tray.on("click", async (event, tray, cursor) => {
     const offset = 10;
