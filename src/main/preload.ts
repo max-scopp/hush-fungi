@@ -14,7 +14,6 @@ import { HassConnectionPhase } from "./hass/HassConnectionPhase";
 import { store } from "./store";
 
 ipcRenderer.on(channels.WANTS_WINDOW_HIDE, () => {
-  log("wants window to hide");
   window.document.documentElement.setAttribute("inactive", "");
   // this is a bit wonky,
   // but the combination of setTimeout() 1 and requestAnimationFrame()

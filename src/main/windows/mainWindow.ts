@@ -7,7 +7,6 @@ import {
   nativeTheme,
   shell,
 } from "electron";
-import { log } from "electron-log";
 import { channels } from "../../shared/channels";
 import { STORE_HASS_URL } from "../../shared/constants";
 import {
@@ -83,7 +82,6 @@ export function focusMainWindow(
     updateMainWindowRect(withRect);
   }
 
-  log(`focus as ${futureMode}`);
   updateMainWindowMode(futureMode);
 
   mainWindow.show();
