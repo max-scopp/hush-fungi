@@ -1,6 +1,6 @@
 import { BrowserWindow, nativeTheme, systemPreferences } from "electron";
 import { log } from "electron-log";
-import { debounce } from "throttle-debounce";
+import debounce from "lodash.debounce";
 import { channels } from "../../shared/channels";
 
 export function injectStyleableSystemPreferences(window: BrowserWindow) {
@@ -24,12 +24,12 @@ export function injectStyleableSystemPreferences(window: BrowserWindow) {
   // on windows, when changing themes, colors and light modes may trigger multiple times,
   // to make sure we do less work, we will debounce these event triggers.
   const handleChange = debounce(
-    100,
     async () => {
       await updateCss();
       window.webContents.send(channels.SYSTEM_PREFERENCES_CHANGED);
     },
-    { atBegin: true },
+    100,
+    { leading: true },
   );
 
   // when the user changed only a color

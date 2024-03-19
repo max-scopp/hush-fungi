@@ -17,7 +17,8 @@ import { Channel, channels } from "../../shared/channels";
 import { HassConnectionPhase } from "./HassConnectionPhase";
 import { hassAuth } from "./hassAuth";
 import { hassUrl } from "./hassUrl";
-Object.assign(global, { WebSocket: require("ws") });
+
+globalThis.WebSocket = require("ws");
 
 export class HassConnection {
   private static _instance: HassConnection;
