@@ -23,14 +23,10 @@ export function injectStyleableSystemPreferences(window: BrowserWindow) {
 
   // on windows, when changing themes, colors and light modes may trigger multiple times,
   // to make sure we do less work, we will debounce these event triggers.
-  const handleChange = debounce(
-    async () => {
-      await updateCss();
-      window.webContents.send(channels.SYSTEM_PREFERENCES_CHANGED);
-    },
-    100,
-    { leading: true },
-  );
+  const handleChange = debounce(async () => {
+    await updateCss();
+    window.webContents.send(channels.SYSTEM_PREFERENCES_CHANGED);
+  }, 100);
 
   // when the user changed only a color
   systemPreferences.on("color-changed", handleChange);

@@ -1,12 +1,5 @@
 import { enable } from "@electron/remote/main";
-import {
-  BrowserWindow,
-  Rectangle,
-  app,
-  ipcMain,
-  nativeTheme,
-  shell,
-} from "electron";
+import { BrowserWindow, Rectangle, app, ipcMain, shell } from "electron";
 import { channels } from "../../shared/channels";
 import { STORE_HASS_URL } from "../../shared/constants";
 import {
@@ -14,7 +7,6 @@ import {
   APP_STORE_USER_RECT,
   MAIN_WINDOW_START_URL,
 } from "../constants";
-import { getTitlebarOverlayStyles } from "../helpers/getTitlebarOverlayStyles";
 import { injectStyleableSystemPreferences } from "../helpers/injectStylableSystemPreferences";
 import { store } from "../store";
 import { buildDefaultWindowOptions } from "./buildDefaultWindowOptions";
@@ -92,7 +84,7 @@ export const createMainWindow = async () => {
   await app.whenReady();
 
   mainWindow = new BrowserWindow({
-    ...buildDefaultWindowOptions("long"),
+    ...buildDefaultWindowOptions("temporary"),
     frame: false,
     titleBarOverlay: false,
 
@@ -108,10 +100,6 @@ export const createMainWindow = async () => {
 
   // TODO: Remove @electron/remote
   enable(mainWindow.webContents);
-
-  nativeTheme.on("updated", () => {
-    mainWindow.setTitleBarOverlay(getTitlebarOverlayStyles());
-  });
 
   mainWindow.loadURL(MAIN_WINDOW_START_URL);
 

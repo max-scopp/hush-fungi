@@ -6,6 +6,9 @@ import { getTitlebarOverlayStyles } from "../helpers/getTitlebarOverlayStyles";
 export function buildDefaultWindowOptions(
   howLongDoesTheWindowExist: "temporary" | "long",
 ): BrowserWindowConstructorOptions {
+  // nativeTheme.on("updated", () => {
+  //   mainWindow.setTitleBarOverlay(getTitlebarOverlayStyles());
+  // });
   return {
     autoHideMenuBar: true,
     center: true,
