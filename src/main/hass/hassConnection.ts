@@ -72,7 +72,7 @@ export class HassConnection {
     template: string,
     treatAsJson?: boolean,
   ): Promise<object | string> {
-    log(`[HASS] fetch template with ${template.length} bytes`);
+    log(`hass: fetch template with ${template.length} bytes`);
 
     const start = performance.now();
     const response = await fetch(this.templateUrl, {
@@ -85,7 +85,7 @@ export class HassConnection {
     });
 
     log(
-      `[HASS] template received in ${((performance.now() - start) / 1_000).toFixed(2)}ms`,
+      `hass: template received in ${((performance.now() - start) / 1_000).toFixed(2)}ms`,
     );
 
     if (treatAsJson) {
@@ -97,28 +97,28 @@ export class HassConnection {
 
   async recoverAsync() {
     if (!hassUrl.isHassKnown()) {
-      log("[HASS] dont recover - hass not known yet");
+      log("hass: dont recover - hass not known yet");
       this.publishNewPhase("hass-not-known");
       return;
     }
 
-    log("[HASS] recover auth");
+    log("hass: recover auth");
     this._auth = await hassAuth.getAuth();
 
     if (!this._auth) {
-      log("[HASS] no auth to recover");
+      log("hass: no auth to recover");
       this.publishNewPhase("failed-auth");
       return;
     }
 
-    log("[HASS] ws: connecting...");
+    log("hass: ws: connecting...");
     this.connection = await createConnection({
       auth: this._auth,
       setupRetry: 3,
     });
     this.publishNewPhase("connected");
     this.onConnected();
-    log("[HASS] ws: connected!");
+    log("hass: ws: connected!");
   }
 
   private notifyAll(channel: Channel, ...args: any[]) {
