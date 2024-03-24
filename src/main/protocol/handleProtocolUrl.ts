@@ -1,5 +1,5 @@
 import { app, dialog } from "electron";
-import { error } from "electron-log";
+import { error, warn } from "electron-log";
 import path from "path";
 import { APP_PROTOCOL_NAME } from "../../shared/constants";
 import { osPlatform } from "../helpers/osPlatform";
@@ -10,16 +10,25 @@ import { focusMainWindow } from "../windows/mainWindow";
  * - `hush-fungi://focus`
  */
 export async function handleProtocolUrl(url: string) {
-  const { hostname } = new URL(url);
-  switch (hostname) {
-    case "focus":
+  try {
+    if (!url) {
       focusMainWindow("protocol");
-      break;
-    default:
-      dialog.showErrorBox(
-        "Protocol Failure",
-        `No known action for "${hostname}"`,
-      );
+      return;
+    }
+
+    const { hostname } = new URL(url);
+    switch (hostname) {
+      case "focus":
+        focusMainWindow("protocol");
+        break;
+      default:
+        dialog.showErrorBox(
+          "Protocol Failure",
+          `No known action for "${hostname}"`,
+        );
+    }
+  } catch (error) {
+    warn(error);
   }
 }
 

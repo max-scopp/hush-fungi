@@ -103,6 +103,7 @@ export const createMainWindow = async () => {
   enable(mainWindow.webContents);
 
   mainWindow.loadURL(MAIN_WINDOW_START_URL);
+  mainWindow.webContents.openDevTools();
 
   mainWindow.on("move", () => updateMainWindowRect(mainWindow.getBounds()));
   mainWindow.on("resize", () => updateMainWindowRect(mainWindow.getBounds()));

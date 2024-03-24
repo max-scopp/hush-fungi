@@ -19,5 +19,5 @@ export const MAIN_WINDOW_START_URL = resolveHtmlPath(
 );
 
 export const TRAY_ICON_PATH = path.resolve(
-  `${__dirname}/../../assets/tray.png`,
+  `${__dirname}/../../images/tray.png`,
 );

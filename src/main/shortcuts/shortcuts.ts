@@ -13,9 +13,6 @@ export async function configureGlobalShortcuts() {
     console.log("registration failed");
   }
 
-  // Check whether a shortcut is registered.
-  console.log(globalShortcut.isRegistered(APP_GLOBAL_SHORTCUT));
-
   app.on("will-quit", () => {
     globalShortcut.unregister(APP_GLOBAL_SHORTCUT);
   });

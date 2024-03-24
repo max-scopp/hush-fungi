@@ -53,6 +53,7 @@
   "license": "MIT",
   "dependencies": {
     "@ant-design/icons": "^5.3.3",
+    "@electron/asar": "^3.2.9",
     "@electron/remote": "^2.1.2",
     "@mdi/js": "^7.4.47",
     "@mdi/react": "^1.6.1",
