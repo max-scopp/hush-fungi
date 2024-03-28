@@ -12,7 +12,6 @@ import { focusMainWindow } from "../windows/mainWindow";
 export async function handleProtocolUrl(url: string) {
   try {
     if (!url) {
-      focusMainWindow("protocol");
       return;
     }
 

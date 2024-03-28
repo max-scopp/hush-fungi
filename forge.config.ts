@@ -10,7 +10,7 @@ const config: ForgeConfig = {
   packagerConfig: {
     asar: true,
     icon: osPlatform.isMac ? `images/appLogo_darwin` : "images/appLogo_win32",
-    extraResource: ["src/assets/*"],
+    extraResource: ["assets/"],
   },
   rebuildConfig: {},
   makers: [

@@ -31,6 +31,15 @@ export async function configureMenu() {
               }
             },
           },
+          {
+            label: "Open DevTools",
+
+            accelerator:
+              process.platform === "darwin" ? "Option+Cmd+I" : "Ctrl+Shift+I",
+            click(_menuItem, browserWindow, _event) {
+              mainWindow.webContents.openDevTools();
+            },
+          },
         ],
       },
     ]),

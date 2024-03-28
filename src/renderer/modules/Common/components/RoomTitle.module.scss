@@ -24,7 +24,7 @@
     backdrop-filter: blur(10px);
 
     :global([platform="darwin"]) & {
-      backdrop-filter: blur(10px) saturate(0.25);
+      backdrop-filter: blur(10px) brightness(0.25);
     }
 
     mask-image: var(--smooth-mask);
