@@ -103,7 +103,6 @@ export const createMainWindow = async () => {
   enable(mainWindow.webContents);
 
   mainWindow.loadURL(MAIN_WINDOW_START_URL);
-  mainWindow.webContents.openDevTools();
 
   mainWindow.on("move", () => updateMainWindowRect(mainWindow.getBounds()));
   mainWindow.on("resize", () => updateMainWindowRect(mainWindow.getBounds()));
@@ -130,13 +129,15 @@ export const createMainWindow = async () => {
 
   mainWindow.on("ready-to-show", () => {
     updateMainWindowRect(mainWindow.getBounds());
+
     if (process.env.START_MINIMIZED) {
       mainWindow.minimize();
     } else {
       const knowsHass = store.get(STORE_HASS_URL);
       if (!knowsHass) {
-        mainWindow.show();
       }
+      mainWindow.show();
+      mainWindow.webContents.openDevTools({ mode: "detach" });
     }
   });
 
