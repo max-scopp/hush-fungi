@@ -45,6 +45,7 @@ export class HassConnection {
     }
 
     this.reconnect();
+    ipcMain.handle(channels.HASS_PHASE, () => global.hassConnectionPhase);
     ipcMain.on(channels.HASS_RECONNECT, () => this.reconnect());
   }
 
@@ -55,6 +56,8 @@ export class HassConnection {
   publishNewPhase(phase: HassConnectionPhase) {
     log(`Publish new phase: ${phase}`);
     global.hassConnectionPhase = phase;
+
+    this.notifyAll(channels.HASS_PHASE, phase);
   }
 
   private get hassUrl() {

@@ -1,5 +1,6 @@
 import { enable } from "@electron/remote/main";
 import { BrowserWindow, Rectangle, app, ipcMain, shell } from "electron";
+import { log } from "electron-log";
 import { channels } from "../../shared/channels";
 import { STORE_HASS_URL } from "../../shared/constants";
 import {
@@ -121,6 +122,7 @@ export const createMainWindow = async () => {
 
   mainWindow.on("blur", () => {
     if (mainWindow.webContents.isDevToolsOpened()) {
+      log("Does not hide window because devtools are open");
       return;
     }
 

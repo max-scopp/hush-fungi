@@ -5,6 +5,7 @@ export const channels = {
   WANTS_WINDOW_HIDE: "ehs_wants_window_hide",
   SYSTEM_PREFERENCES_CHANGED: "ehs_system_preferences_changed",
 
+  HASS_PHASE: "hass_phase",
   HASS_RECONNECT: "hass_reconnect",
   HASS_RECONNECTED: "hass_reconnected",
   HASS_CALL_SERVICE: "hass_call_service",

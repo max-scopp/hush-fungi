@@ -1,5 +1,5 @@
 import { createMemoryRouter, redirect } from "react-router-dom";
-import { HassConnectionPhase } from "../main/hass/HassConnectionPhase";
+
 import { Home } from "./pages/Home";
 import { NoRoute } from "./pages/NoRoute";
 import { Setup } from "./pages/Setup";
@@ -9,9 +9,7 @@ export const router = createMemoryRouter([
     index: true,
     element: <Home />,
     loader: async () => {
-      const phase = window.electron.remote.getGlobal(
-        "hassConnectionPhase",
-      ) as HassConnectionPhase;
+      const phase = await window.hass.getPhase();
 
       switch (phase) {
         case "connected":

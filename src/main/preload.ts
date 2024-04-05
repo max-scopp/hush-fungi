@@ -146,7 +146,18 @@ ipcRenderer.on(channels.HASS_RECONNECTED, () =>
   dispatchEvent(new CustomEvent(browserEvents.reconnected)),
 );
 
+ipcRenderer.on(channels.HASS_PHASE, (_, phase) =>
+  dispatchEvent(
+    new CustomEvent(browserEvents.reconnected, {
+      detail: phase,
+    }),
+  ),
+);
+
 const hassHandler = {
+  async getPhase() {
+    return ipcRenderer.invoke(channels.HASS_PHASE);
+  },
   reconnect() {
     ipcRenderer.send(channels.HASS_RECONNECT);
   },
