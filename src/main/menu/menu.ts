@@ -1,5 +1,6 @@
-import { Menu, app, dialog } from "electron";
+import { BrowserWindow, Menu, app, dialog } from "electron";
 import { store } from "../store";
+import { buildDefaultWindowOptions } from "../windows/buildDefaultWindowOptions";
 import { focusMainWindow, mainWindow } from "../windows/mainWindow";
 
 export async function configureMenu() {
@@ -39,8 +40,27 @@ export async function configureMenu() {
             },
           },
           {
-            label: "Open DevTools",
+            label: "Empty Screen",
+            click(_menuItem, browserWindow, _event) {
+              const win = new BrowserWindow({
+                ...buildDefaultWindowOptions("temporary"),
 
+                height: 583,
+                useContentSize: true,
+                width: 480,
+                titleBarStyle: "hiddenInset",
+                frame: false,
+                vibrancy: "fullscreen-ui",
+                webPreferences: {
+                  experimentalFeatures: true,
+                },
+              });
+
+              win.show();
+            },
+          },
+          {
+            label: "Open DevTools",
             accelerator:
               process.platform === "darwin" ? "Option+Cmd+I" : "Ctrl+Shift+I",
             click(_menuItem, browserWindow, _event) {

@@ -19,3 +19,5 @@ export const MAIN_WINDOW_START_URL = resolveHtmlPath(
 );
 
 export const TRAY_ICON_PATH = `${RESOURCES_PATH}/tray.png`;
+
+export const HASS_HOOK_PATH = path.resolve(__dirname, "hook.js");

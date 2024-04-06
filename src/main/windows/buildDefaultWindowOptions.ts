@@ -21,7 +21,7 @@ export function buildDefaultWindowOptions(
     icon: getAssetPath("icon.png"),
     titleBarStyle: "hidden",
     titleBarOverlay: getTitlebarOverlayStyles(),
-    vibrancy: howLongDoesTheWindowExist === "long" ? "fullscreen-ui" : "sheet",
+    vibrancy: howLongDoesTheWindowExist === "long" ? "sheet" : "fullscreen-ui",
 
     backgroundMaterial:
       howLongDoesTheWindowExist === "long" ? "mica" : "acrylic",
@@ -31,6 +31,7 @@ export function buildDefaultWindowOptions(
       // must be `true` for @electron/remote cant move away from it yet.
       nodeIntegration: true,
       contextIsolation: false,
+      scrollBounce: true,
     },
   };
 }

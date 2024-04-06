@@ -12,7 +12,6 @@ const config: ForgeConfig = {
     icon: osPlatform.isMac ? `images/appLogo_darwin` : "images/appLogo_win32",
     extraResource: ["assets/"],
   },
-  rebuildConfig: {},
   makers: [
     new MakerSquirrel({}), // for windows, also creates installer
     new MakerZIP({}, ["darwin"]), // for macOS app
@@ -29,6 +28,11 @@ const config: ForgeConfig = {
           // `entry` is just an alias for `build.lib.entry` in the corresponding file of `config`.
           entry: "src/main/main.ts",
           config: "vite.main.config.ts",
+        },
+        {
+          // `entry` is just an alias for `build.lib.entry` in the corresponding file of `config`.
+          entry: "src/hass/hook.ts",
+          config: "vite.hass_hook.config.ts",
         },
         {
           entry: "src/main/preload.ts",

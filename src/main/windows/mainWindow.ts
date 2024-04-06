@@ -136,8 +136,6 @@ export const createMainWindow = async () => {
       mainWindow.minimize();
     } else {
       const knowsHass = store.get(STORE_HASS_URL);
-      if (!knowsHass) {
-      }
       mainWindow.show();
       mainWindow.webContents.openDevTools({ mode: "detach" });
     }
