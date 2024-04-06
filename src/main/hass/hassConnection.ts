@@ -49,6 +49,7 @@ export class HassConnection {
 
     this.reconnect();
     ipcMain.handle(channels.HASS_PHASE, () => this._phase);
+    ipcMain.handle(channels.HASS_GET_AUTH, () => this._auth.data);
     ipcMain.on(channels.HASS_RECONNECT, () => this.reconnect());
   }
 

@@ -6,6 +6,7 @@ export const channels = {
   SYSTEM_PREFERENCES_CHANGED: "ehs_system_preferences_changed",
 
   HASS_PHASE: "hass_phase",
+  HASS_GET_AUTH: "hass_get_auth",
   HASS_RECONNECT: "hass_reconnect",
   HASS_RECONNECTED: "hass_reconnected",
   HASS_CALL_SERVICE: "hass_call_service",

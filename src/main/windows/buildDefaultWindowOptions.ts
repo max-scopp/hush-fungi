@@ -30,6 +30,7 @@ export function buildDefaultWindowOptions(
       preload: path.join(__dirname, "preload.js"),
       // must be `true` for @electron/remote cant move away from it yet.
       nodeIntegration: true,
+      contextIsolation: false,
     },
   };
 }

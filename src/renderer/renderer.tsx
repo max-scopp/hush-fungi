@@ -16,19 +16,4 @@
  * for it yet.
  */
 
-import React from "react";
-import ReactDOM from "react-dom/client";
-import { App } from "./components/App";
-import "./global.scss";
-
-window.addEventListener("keyup", ({ code }) => {
-  if (code === "Escape") {
-    window.electron.window.blur();
-  }
-});
-
-ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-);
+document.documentElement.append("No react!");

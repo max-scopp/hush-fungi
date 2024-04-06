@@ -1,4 +1,5 @@
 import { Menu, app, dialog } from "electron";
+import { store } from "../store";
 import { focusMainWindow, mainWindow } from "../windows/mainWindow";
 
 export async function configureMenu() {
@@ -29,6 +30,12 @@ export async function configureMenu() {
               if (browserWindow.id === mainWindow.id) {
                 browserWindow.hide();
               }
+            },
+          },
+          {
+            label: "Open Storage",
+            click(_menuItem, browserWindow, _event) {
+              store.openInEditor();
             },
           },
           {

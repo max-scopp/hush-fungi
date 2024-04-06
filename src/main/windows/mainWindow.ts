@@ -3,11 +3,7 @@ import { BrowserWindow, Rectangle, app, ipcMain, shell } from "electron";
 import { log } from "electron-log";
 import { channels } from "../../shared/channels";
 import { STORE_HASS_URL } from "../../shared/constants";
-import {
-  APP_STORE_TRAY_RECT,
-  APP_STORE_USER_RECT,
-  MAIN_WINDOW_START_URL,
-} from "../constants";
+import { APP_STORE_TRAY_RECT, APP_STORE_USER_RECT } from "../constants";
 import { injectStyleableSystemPreferences } from "../helpers/injectStylableSystemPreferences";
 import { store } from "../store";
 import { buildDefaultWindowOptions } from "./buildDefaultWindowOptions";
@@ -94,16 +90,20 @@ export const createMainWindow = async () => {
     minimizable: false,
 
     maxWidth: 600,
-    maxHeight: 1_000,
+    maxHeight: 1_200,
 
     width: 460,
-    height: 728,
+    height: 800,
   });
 
   // TODO: Remove @electron/remote
   enable(mainWindow.webContents);
 
-  mainWindow.loadURL(MAIN_WINDOW_START_URL);
+  const externalAuthHassUrl = new URL(
+    "/?external_auth=1",
+    store.get(STORE_HASS_URL) as string,
+  );
+  mainWindow.loadURL(externalAuthHassUrl.toString());
 
   mainWindow.on("move", () => updateMainWindowRect(mainWindow.getBounds()));
   mainWindow.on("resize", () => updateMainWindowRect(mainWindow.getBounds()));
@@ -148,15 +148,15 @@ export const createMainWindow = async () => {
   // const menuBuilder = new MenuBuilder(mainWindow);
   // menuBuilder.buildMenu();
 
-  mainWindow.webContents.on("will-navigate", (event) => {
-    const nonElectronUrl = !event.url.startsWith(MAIN_WINDOW_START_URL);
-    if (nonElectronUrl) {
-      shell.openExternal(event.url);
-      event.preventDefault();
+  // mainWindow.webContents.on("will-navigate", (event) => {
+  //   const nonElectronUrl = !event.url.startsWith(MAIN_WINDOW_START_URL);
+  //   if (nonElectronUrl) {
+  //     shell.openExternal(event.url);
+  //     event.preventDefault();
 
-      return { action: "deny" };
-    }
-  });
+  //     return { action: "deny" };
+  //   }
+  // });
 
   // Open urls in the user's browser
   mainWindow.webContents.setWindowOpenHandler((edata) => {

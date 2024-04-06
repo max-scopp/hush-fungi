@@ -18,6 +18,39 @@ export function injectStyleableSystemPreferences(window: BrowserWindow) {
             :root {
                 --sys-accent-color: #${systemPreferences.getAccentColor()}
             }
+
+            
+        html,body {
+          background-color: transparent !important;
+          text-shadow: 1px 1px 2px hsl(0deg 0% 0% / 14%);
+      
+          --primary-background-color: none;
+          --lovelace-background: none;
+          --app-header-background-color: hsl(0deg 0% 0% / 50%);
+      
+          --ha-view-sections-column-max-width: 600px;
+      
+          --card-background-color: hsl(0deg 0% 0% / 42%);
+          --divider-color: hsl(0deg 0% 0% / 0%);
+      
+          /* macos */
+          --ha-card-border-radius: 20px;
+          --mush-chip-border-radius: 20px;
+      
+          --ha-view-sections-row-gap: 15px;
+          --ha-section-grid-row-gap: 10px;
+          --ha-section-grid-column-gap: 10px
+        }
+      
+        ::-webkit-scrollbar {
+            width: 0.4rem;
+            height: 0.4rem;
+        }
+      
+        ::-webkit-scrollbar-thumb {
+          border-radius: 4px;
+          background: var(--scrollbar-thumb-color);
+        }
         `);
   };
 
