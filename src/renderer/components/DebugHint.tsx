@@ -1,4 +1,4 @@
-import { Badge, Button, Flex, Space } from "antd";
+import { Badge, Button, Flex } from "antd";
 import { ReactNode } from "react";
 import { HassConnectionPhase } from "../../main/hass/HassConnectionPhase";
 
@@ -30,14 +30,6 @@ export function DebugHint() {
       >
         edit storage
       </Button>
-      <Space>
-        <b>HASS</b>
-        {state[
-          window.electron.remote.getGlobal(
-            "hassConnectionPhase",
-          ) as HassConnectionPhase
-        ] ?? state.unknown}
-      </Space>
     </Flex>
   );
 }

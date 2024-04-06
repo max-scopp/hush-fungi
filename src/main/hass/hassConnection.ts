@@ -3,6 +3,9 @@ import Logger, { log } from "electron-log";
 import {
   Auth,
   Connection,
+  ERR_CONNECTION_LOST,
+  ERR_HASS_HOST_REQUIRED,
+  ERR_INVALID_AUTH,
   HassServiceTarget,
   callService,
   configColl,
@@ -45,19 +48,19 @@ export class HassConnection {
     }
 
     this.reconnect();
-    ipcMain.handle(channels.HASS_PHASE, () => global.hassConnectionPhase);
+    ipcMain.handle(channels.HASS_PHASE, () => this._phase);
     ipcMain.on(channels.HASS_RECONNECT, () => this.reconnect());
   }
 
   private readonly reconnect = () => this.recoverAsync().catch(Logger.error);
 
-  static _phase: HassConnectionPhase = "unknown";
+  _phase: HassConnectionPhase = "unknown";
 
   publishNewPhase(phase: HassConnectionPhase) {
     log(`Publish new phase: ${phase}`);
-    global.hassConnectionPhase = phase;
+    this._phase = phase;
 
-    this.notifyAll(channels.HASS_PHASE, phase);
+    this.notifyAll(channels.HASS_PHASE, this._phase);
   }
 
   private get hassUrl() {
@@ -99,29 +102,44 @@ export class HassConnection {
   }
 
   async recoverAsync() {
-    if (!hassUrl.isHassKnown()) {
-      log("hass: dont recover - hass not known yet");
-      this.publishNewPhase("hass-not-known");
-      return;
+    try {
+      if (!hassUrl.isHassKnown()) {
+        log("hass: dont recover - hass not known yet");
+        this.publishNewPhase("hass-not-known");
+        return;
+      }
+
+      log("hass: recover auth");
+      this._auth = await hassAuth.getAuth();
+
+      if (!this._auth) {
+        log("hass: no auth to recover");
+        this.publishNewPhase("failed-auth");
+        return;
+      }
+
+      log("hass: ws: connecting...");
+      this.connection = await createConnection({
+        auth: this._auth,
+        setupRetry: 3,
+      });
+      this.publishNewPhase("connected");
+      this.onConnected();
+      log("hass: ws: connected!");
+    } catch (error) {
+      if (typeof error === "number") {
+        switch (error) {
+          case ERR_HASS_HOST_REQUIRED:
+            return this.publishNewPhase("hass-not-known");
+          case ERR_INVALID_AUTH:
+            return this.publishNewPhase("failed-auth");
+          case ERR_CONNECTION_LOST:
+            return this.publishNewPhase("disconnected");
+        }
+      }
+
+      Logger.error("hass: ws: connection error is", error);
     }
-
-    log("hass: recover auth");
-    this._auth = await hassAuth.getAuth();
-
-    if (!this._auth) {
-      log("hass: no auth to recover");
-      this.publishNewPhase("failed-auth");
-      return;
-    }
-
-    log("hass: ws: connecting...");
-    this.connection = await createConnection({
-      auth: this._auth,
-      setupRetry: 3,
-    });
-    this.publishNewPhase("connected");
-    this.onConnected();
-    log("hass: ws: connected!");
   }
 
   private notifyAll(channel: Channel, ...args: any[]) {

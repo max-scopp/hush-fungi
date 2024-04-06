@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { create } from "zustand";
 import {
+  APP_INTERNAL_SERVER_ADRESS,
   DEFAULT_HASS_URL,
   STORE_HASS_AUTH,
   STORE_HASS_URL,
@@ -45,8 +46,8 @@ const useAuthCallback = create<AuthCallbackState>((set) => {
 function authenticateHass(onSave?: () => void) {
   return getAuth({
     hassUrl,
-    clientId: window.electron.remote.getGlobal("localServerAddress"),
-    redirectUrl: window.electron.remote.getGlobal("localServerAddress"),
+    clientId: APP_INTERNAL_SERVER_ADRESS,
+    redirectUrl: APP_INTERNAL_SERVER_ADRESS,
     saveTokens: (data) => {
       window.electron.storage.set(STORE_HASS_AUTH, data);
       window.hass.reconnect();

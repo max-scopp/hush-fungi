@@ -1,6 +1,6 @@
-import { getCurrentWindow, getGlobal } from "@electron/remote";
+import { getCurrentWindow } from "@electron/remote";
 import { IpcRendererEvent, contextBridge, ipcRenderer } from "electron";
-import Logger, { log } from "electron-log";
+import { log } from "electron-log";
 import {
   HassConfig,
   HassEntities,
@@ -10,7 +10,6 @@ import {
 import { StateCreator } from "zustand";
 import { browserEvents } from "../shared/browserEvents";
 import { Channel, channels } from "../shared/channels";
-import { HassConnectionPhase } from "./hass/HassConnectionPhase";
 import { store } from "./store";
 
 ipcRenderer.on(channels.WANTS_WINDOW_HIDE, () => {
@@ -54,20 +53,6 @@ const electronHandler = {
       return store.openInEditor();
     },
   },
-  remote: {
-    /**
-     * @deprecated I want to move away from @electron/remote
-     */
-    getGlobal(globalName: string) {
-      const result = getGlobal(globalName);
-      if (JSON.stringify(result).length > 500) {
-        Logger.error(
-          `getGlobal("${globalName}") in renderer communicated large data. Avoid it.`,
-        );
-      }
-      return result;
-    },
-  },
   ipcRenderer: {
     sendMessage(channel: Channel, ...args: unknown[]) {
       ipcRenderer.send(channel, ...args);
@@ -93,12 +78,11 @@ type EntitiesState = {
   entities: HassEntities;
 };
 
-const phase: HassConnectionPhase = getGlobal("hassConnectionPhase");
-
+/**
+ * TODO: wtf was I thinking delme
+ */
 const lazySync = (work: () => Promise<any>) => {
-  if (phase === "connected") {
-    work();
-  }
+  work();
 };
 
 const hassStoreCreator: StateCreator<EntitiesState> = (setState) => {

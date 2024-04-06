@@ -1,11 +1,11 @@
-import { Http2ServerRequest, Http2ServerResponse } from "http2";
+import { IncomingMessage, OutgoingMessage } from "http";
 import { APP_INTERNAL_SERVER_ADRESS } from "../../shared/constants";
 import { MAIN_WINDOW_START_URL } from "../constants";
 import { mainWindow } from "../windows/mainWindow";
 
 export function handleRequest(
-  request: Http2ServerRequest,
-  response: Http2ServerResponse,
+  request: IncomingMessage,
+  response: OutgoingMessage,
 ) {
   const url = new URL(request.url, APP_INTERNAL_SERVER_ADRESS);
 

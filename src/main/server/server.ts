@@ -1,5 +1,5 @@
 import { log } from "electron-log";
-import { Http2Server, createServer } from "http2";
+import { Server, createServer } from "http";
 import {
   APP_INTERNAL_HOST,
   APP_INTERNAL_PORT,
@@ -7,7 +7,7 @@ import {
 } from "../../shared/constants";
 import { handleRequest } from "./handleRequest";
 
-let server: Http2Server = null;
+let server: Server = null;
 
 export async function createAppServer() {
   if (server) return;

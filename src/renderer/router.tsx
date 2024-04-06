@@ -15,6 +15,7 @@ export const router = createMemoryRouter([
         case "connected":
           return null;
         case "hass-not-known":
+        case "unknown":
         case "failed-auth":
           return redirect("/setup");
         // case "failed-auth":
