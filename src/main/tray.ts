@@ -1,6 +1,7 @@
 import { Menu, Tray, app, screen } from "electron";
 import { TRAY_ICON_PATH } from "./constants";
 import { osPlatform } from "./helpers/osPlatform";
+import { stuffsMenu } from "./menu/stuffsMenu";
 import {
   focusMainWindow,
   mainWindow,
@@ -35,9 +36,7 @@ export async function createTray() {
   });
 
   if (!osPlatform.isMac) {
-    const contextMenu = Menu.buildFromTemplate([
-      { label: "Quit", click: () => process.exit(1) },
-    ]);
+    const contextMenu = Menu.buildFromTemplate(stuffsMenu);
 
     tray.setContextMenu(contextMenu);
   }

@@ -5,7 +5,7 @@ import unhandled, { logError } from "electron-unhandled";
 import { configureSingleInstance } from "./boot/configureSingleInstance";
 import { installExtensions } from "./dev/installExtensions";
 import { HassConnection } from "./hass/hassConnection";
-import { configureMenu } from "./menu/menu";
+import { configureMenu } from "./menu/configureMenu";
 import { configureProtocol } from "./protocol/handleProtocolUrl";
 import { createAppServer } from "./server/server";
 import { configureGlobalShortcuts } from "./shortcuts/shortcuts";

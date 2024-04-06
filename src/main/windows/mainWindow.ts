@@ -89,10 +89,10 @@ export const createMainWindow = async () => {
     maximizable: false,
     minimizable: false,
 
-    maxWidth: 600,
+    maxWidth: 450,
     maxHeight: 1_200,
 
-    width: 460,
+    width: 450,
     height: 800,
   });
 

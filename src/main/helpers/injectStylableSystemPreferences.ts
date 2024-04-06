@@ -25,28 +25,59 @@ export async function injectStyleableSystemPreferences(window: BrowserWindow) {
     window.webContents.executeJavaScript(`(() => {${hookJs}})()`);
 
     lastInjectId = await window.webContents.insertCSS(`
-        html,body {
-          background-color: transparent !important;
-          text-shadow: 1px 1px 2px hsl(0deg 0% 0% / 14%);
 
-          --primary-background-color: none;
-          --lovelace-background: none;
-          --app-header-background-color: hsl(0deg 0% 0% / 50%);
+      html,body {
+        background-color: transparent !important;
+        --primary-background-color: none;
+        --lovelace-background: none;
+        --ha-view-sections-column-max-width: 600px;
+        --header-height: 45px;
 
-          --ha-view-sections-column-max-width: 600px;
+        --app-header-text-color: var(--primary-text-color);
+      }
 
-          --card-background-color: hsl(0deg 0% 0% / 42%);
-          --divider-color: hsl(0deg 0% 0% / 0%);
+    @media screen and (prefers-color-scheme: light) {
+      
+      html, body {
+        text-shadow: 1px 1px 2px hsl(0deg 0% 100% / 8%);
 
-          /* macos */
-          --ha-card-border-radius: 20px;
-          --mush-chip-border-radius: 20px;
+        --app-header-background-color: hsl(0deg 0% 100% / 30%);
 
-          --ha-view-sections-row-gap: 15px;
-          --ha-section-grid-row-gap: 10px;
-          --ha-section-grid-column-gap: 10px
+        --card-background-color: hsl(0deg 0% 100% / 30%);
+        --divider-color: hsl(0deg 0% 0% / 0%);
+      }
+    }
 
-        }
+    @media screen and (prefers-color-scheme: dark) {
+      
+      html, body {
+        text-shadow: 1px 1px 2px hsl(0deg 0% 0% / 14%);
+        
+        --app-header-background-color: hsl(0deg 0% 0% / 50%);
+
+        --card-background-color: hsl(0deg 0% 0% / 42%);
+      }
+    }
+
+    [platform=darwin]:root {
+      --divider-color: hsl(0deg 0% 0% / 0%);
+      --ha-card-border-radius: 20px;
+      --mush-chip-border-radius: 20px;
+
+      --ha-view-sections-row-gap: 15px;
+      --ha-section-grid-row-gap: 10px;
+      --ha-section-grid-column-gap: 10px
+    }
+
+    [platform=win32]:root {
+      --divider-color: hsl(0deg 0% 0% / 20%);
+      --ha-card-border-radius: 10px;
+      --mush-chip-border-radius: 5px;
+
+      --ha-view-sections-row-gap: 15px;
+      --ha-section-grid-row-gap: 10px;
+      --ha-section-grid-column-gap: 10px
+    }
 
       /*
       ::-webkit-scrollbar {
