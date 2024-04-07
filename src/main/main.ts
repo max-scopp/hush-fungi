@@ -1,4 +1,3 @@
-import Remote from "@electron/remote/main";
 import { default as ElectronLog } from "electron-log";
 import ElectronStore from "electron-store";
 import unhandled, { logError } from "electron-unhandled";
@@ -25,7 +24,6 @@ async function main() {
 
   unhandled();
   ElectronLog.initialize();
-  Remote.initialize(); // TODO: Get rid of @electron/remote
   ElectronStore.initRenderer();
   HassConnection.init();
 

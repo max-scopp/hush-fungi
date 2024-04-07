@@ -11,9 +11,6 @@
  *
  * https://electronjs.org/docs/tutorial/security
  *
- * Currently, the Node.js integration is enabled for @electron/remote to work,
- * however, I want to move away from it but haven't been arsed to make all the changed
- * for it yet.
  */
 
 import "@material/web/button/filled-button.js";

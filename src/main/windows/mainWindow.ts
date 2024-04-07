@@ -1,4 +1,3 @@
-import { enable } from "@electron/remote/main";
 import { BrowserWindow, Rectangle, app, ipcMain, shell } from "electron";
 import { log } from "electron-log";
 import { channels } from "../../shared/channels";
@@ -95,9 +94,6 @@ export const createMainWindow = async () => {
     width: 450,
     height: 800,
   });
-
-  // TODO: Remove @electron/remote
-  enable(mainWindow.webContents);
 
   const externalAuthHassUrl = new URL(
     "/?external_auth=1",
