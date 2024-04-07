@@ -1,6 +1,7 @@
-import { ipcRenderer, webFrame } from "electron";
+import { webFrame } from "electron";
 import { log } from "electron-log";
-import { channels } from "../shared/channels";
+import { STORE_HASS_AUTH } from "../shared/constants";
+import { store } from "./store";
 
 webFrame.setZoomFactor(18 / 20);
 
@@ -8,7 +9,7 @@ const externalAppHandler = {
   getExternalAuth(payload: string) {
     const { callback, force = false } = JSON.parse(payload);
     setTimeout(async () => {
-      const auth = await ipcRenderer.invoke(channels.HASS_GET_AUTH);
+      const auth = await store.get(STORE_HASS_AUTH);
 
       (window[callback] as any)(true, auth);
     });

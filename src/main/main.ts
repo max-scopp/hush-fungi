@@ -3,7 +3,6 @@ import ElectronStore from "electron-store";
 import unhandled, { logError } from "electron-unhandled";
 import { configureSingleInstance } from "./boot/configureSingleInstance";
 import { installExtensions } from "./dev/installExtensions";
-import { HassConnection } from "./hass/hassConnection";
 import { configureMenu } from "./menu/configureMenu";
 import { configureProtocol } from "./protocol/handleProtocolUrl";
 import { createAppServer } from "./server/server";
@@ -25,7 +24,6 @@ async function main() {
   unhandled();
   ElectronLog.initialize();
   ElectronStore.initRenderer();
-  HassConnection.init();
 
   await configureSingleInstance();
   await configureProtocol();
