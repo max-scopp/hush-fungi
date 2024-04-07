@@ -35,6 +35,8 @@ declare global {
   interface Window {
     externalApp: typeof externalAppHandler;
     externalBus: (message: SuccessResult | ErrorResult) => void;
+
+    store: typeof storeHandler;
   }
 }
 

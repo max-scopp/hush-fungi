@@ -12,9 +12,10 @@
  * https://electronjs.org/docs/tutorial/security
  *
  */
-import "@material/web/button/filled-button.js";
-import "@material/web/button/outlined-button.js";
-import "@material/web/checkbox/checkbox.js";
+import "@material/web/all.js";
+import "./components/hf-settings";
+import "./components/hf-titlebar";
 import "./global.scss";
+import { setSystemTheme } from "./setSystemTheme";
 
-// document.documentElement.append("No react!");
+setSystemTheme();

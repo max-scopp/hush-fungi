@@ -1,3 +1,4 @@
+import { ipcMain, systemPreferences } from "electron";
 import { default as ElectronLog } from "electron-log";
 import ElectronStore from "electron-store";
 import unhandled, { logError } from "electron-unhandled";
@@ -37,6 +38,8 @@ async function main() {
     createTray(),
     installExtensions(),
   ]);
+
+  ipcMain.handle("os-accent-color", () => systemPreferences.getAccentColor());
 
   await createMainWindow();
 }

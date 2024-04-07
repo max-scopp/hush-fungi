@@ -1,6 +1,9 @@
 import { BrowserWindow, Rectangle, app, shell } from "electron";
 import { log } from "electron-log";
-import { STORE_HASS_URL } from "../../shared/constants";
+import {
+  STORE_HASS_URL,
+  STORE_PREFERRED_SURFACE,
+} from "../../shared/constants";
 import { APP_STORE_TRAY_RECT, APP_STORE_USER_RECT } from "../constants";
 import { injectStyleableSystemPreferences } from "../helpers/injectStylableSystemPreferences";
 import { store } from "../store";
@@ -102,6 +105,20 @@ export const createMainWindow = async () => {
 
   mainWindow.on("move", () => updateMainWindowRect(mainWindow.getBounds()));
   mainWindow.on("resize", () => updateMainWindowRect(mainWindow.getBounds()));
+
+  mainWindow.on("show", () => {
+    const preferredSurface = store.get(STORE_PREFERRED_SURFACE);
+
+    if (preferredSurface) {
+      if (preferredSurface === "mica") {
+        mainWindow.setVibrancy("menu");
+        mainWindow.setBackgroundMaterial("mica");
+      } else {
+        mainWindow.setVibrancy("fullscreen-ui");
+        mainWindow.setBackgroundMaterial("acrylic");
+      }
+    }
+  });
 
   mainWindow.on("blur", () => {
     if (mainWindow.webContents.isDevToolsOpened()) {

@@ -5,11 +5,11 @@ export function getTitlebarOverlayStyles(): Electron.TitleBarOverlay {
     ? {
         color: "black",
         symbolColor: "white",
-        height: 30,
+        height: 35,
       }
     : {
         color: "white",
         symbolColor: "black",
-        height: 30,
+        height: 35,
       };
 }

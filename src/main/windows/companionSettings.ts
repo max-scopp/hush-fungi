@@ -6,7 +6,7 @@ export let companionSettings: BrowserWindow = null;
 
 export const showCompanionSettingsWindow = async () => {
   // await app.whenReady();
-  if (companionSettings) {
+  if (companionSettings && !companionSettings.isDestroyed()) {
     companionSettings.show();
     companionSettings.focus();
     return;
@@ -14,18 +14,15 @@ export const showCompanionSettingsWindow = async () => {
 
   companionSettings = new BrowserWindow({
     ...buildDefaultWindowOptions("long"),
+    show: true,
     maximizable: false,
     minimizable: false,
 
-    maxWidth: 450,
-    maxHeight: 1_200,
-
-    width: 450,
+    width: 1200,
     height: 800,
   });
 
   companionSettings.loadURL(SETTINGS_WINDOW_START_URL);
-  companionSettings.show();
   companionSettings.webContents.openDevTools({ mode: "detach" });
 
   companionSettings.on("closed", () => {

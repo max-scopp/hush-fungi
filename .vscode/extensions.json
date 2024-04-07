@@ -3,6 +3,7 @@
     "esbenp.prettier-vscode",
     "clinyong.vscode-css-modules",
     "txava.region-marker",
-    "wiensss.region-highlighter"
+    "wiensss.region-highlighter",
+    "runem.lit-plugin"
   ]
 }

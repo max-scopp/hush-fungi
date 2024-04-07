@@ -1,3 +1,4 @@
+export const STORE_PREFERRED_SURFACE = "surfaceType";
 export const STORE_HASS_AUTH = "haAuth";
 export const STORE_HASS_URL = "haUrl";
 export const DEFAULT_HASS_URL = "http://homeassistant.local:8123";

@@ -1,7 +1,10 @@
 import { BrowserWindow, MenuItemConstructorOptions } from "electron";
 import { store } from "../store";
 import { buildDefaultWindowOptions } from "../windows/buildDefaultWindowOptions";
-import { showCompanionSettingsWindow } from "../windows/companionSettings";
+import {
+  companionSettings,
+  showCompanionSettingsWindow,
+} from "../windows/companionSettings";
 import { mainWindow } from "../windows/mainWindow";
 
 export const stuffsMenu: MenuItemConstructorOptions[] = [
@@ -53,7 +56,19 @@ export const stuffsMenu: MenuItemConstructorOptions[] = [
     accelerator:
       process.platform === "darwin" ? "Option+Cmd+I" : "Ctrl+Shift+I",
     click(_menuItem, browserWindow, _event) {
-      mainWindow.webContents.openDevTools();
+      mainWindow?.webContents.openDevTools({
+        mode: "detach",
+        activate: true,
+      });
+    },
+  },
+  {
+    label: "Open Settings DevTools",
+    click(_menuItem, browserWindow, _event) {
+      companionSettings?.webContents.openDevTools({
+        mode: "detach",
+        activate: true,
+      });
     },
   },
 ];

@@ -19,9 +19,6 @@ export async function injectStyleableSystemPreferences(window: BrowserWindow) {
       `(main) inject system preferences into window ${window.id} "${window.title}"`,
     );
 
-    await window.webContents.executeJavaScript(`
-        global.osAccentColor = "#${systemPreferences.getAccentColor()}";
-    `);
     window.webContents.executeJavaScript(`(() => {${hookJs}})()`);
 
     lastInjectId = await window.webContents.insertCSS(`

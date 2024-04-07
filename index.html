@@ -5,21 +5,11 @@
     <title>Settings</title>
     <!-- allow native webview elements (such as scrollbars) will adapt to the color scheme -->
     <meta name="color-scheme" content="light dark" />
-    <script>
-      document.documentElement.setAttribute(
-        "platform",
-        window.electron.platform,
-      );
-    </script>
   </head>
   <body>
-    <label>
-      Material 3
-      <md-checkbox checked></md-checkbox>
-    </label>
-
-    <md-outlined-button>Back</md-outlined-button>
-    <md-filled-button>Next</md-filled-button>
+    <hf-titlebar></hf-titlebar>
+    
+    <hf-settings></hf-settings>
 
     <script type="module" src="/src/renderer/renderer.tsx"></script>
   </body>

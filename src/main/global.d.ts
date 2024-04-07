@@ -1,5 +1,7 @@
 declare global {
-  // nop
+  interface Window {
+    osAccentColor: string;
+  }
 }
 
 export {};
