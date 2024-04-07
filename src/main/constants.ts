@@ -14,7 +14,7 @@ export const RESOURCES_PATH = app.isPackaged
   ? path.join(process.resourcesPath, "assets")
   : path.join(__dirname, "../../assets");
 
-export const MAIN_WINDOW_START_URL = resolveHtmlPath(
+export const SETTINGS_WINDOW_START_URL = resolveHtmlPath(
   `${MAIN_WINDOW_VITE_NAME}/index.html`,
 );
 

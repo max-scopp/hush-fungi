@@ -1,6 +1,6 @@
 import { IncomingMessage, OutgoingMessage } from "http";
 import { APP_INTERNAL_SERVER_ADRESS } from "../../shared/constants";
-import { MAIN_WINDOW_START_URL } from "../constants";
+import { SETTINGS_WINDOW_START_URL } from "../constants";
 import { mainWindow } from "../windows/mainWindow";
 
 export function handleRequest(
@@ -13,7 +13,7 @@ export function handleRequest(
     case url.searchParams.has("auth_callback") &&
       url.searchParams.has("code") &&
       url.searchParams.has("state"): {
-      const startUrl = MAIN_WINDOW_START_URL;
+      const startUrl = SETTINGS_WINDOW_START_URL;
       const params = /(\?.*$)/.exec(request.url)[0];
 
       const redirected = startUrl + params;

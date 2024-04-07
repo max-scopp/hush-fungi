@@ -1,6 +1,5 @@
-import { BrowserWindow, Rectangle, app, ipcMain, shell } from "electron";
+import { BrowserWindow, Rectangle, app, shell } from "electron";
 import { log } from "electron-log";
-import { channels } from "../../shared/channels";
 import { STORE_HASS_URL } from "../../shared/constants";
 import { APP_STORE_TRAY_RECT, APP_STORE_USER_RECT } from "../constants";
 import { injectStyleableSystemPreferences } from "../helpers/injectStylableSystemPreferences";
@@ -104,25 +103,13 @@ export const createMainWindow = async () => {
   mainWindow.on("move", () => updateMainWindowRect(mainWindow.getBounds()));
   mainWindow.on("resize", () => updateMainWindowRect(mainWindow.getBounds()));
 
-  //#region hide content when inactive for windows animations
-  ipcMain.on(channels.WANTS_WINDOW_HIDE, (event, windowId) => {
-    if (windowId === mainWindow.id) {
-      mainWindow.hide();
-    }
-  });
-
-  const hideWindow = async () => {
-    mainWindow.webContents.send(channels.WANTS_WINDOW_HIDE);
-  };
-  //#endregion
-
   mainWindow.on("blur", () => {
     if (mainWindow.webContents.isDevToolsOpened()) {
       log("Does not hide window because devtools are open");
       return;
     }
 
-    hideWindow();
+    mainWindow.hide();
   });
 
   mainWindow.on("ready-to-show", () => {

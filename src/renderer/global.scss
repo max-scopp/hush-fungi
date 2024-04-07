@@ -1,79 +1,22 @@
-@import "overlayscrollbars/overlayscrollbars.css";
+// @import "overlayscrollbars/overlayscrollbars.css";
 
 :root {
-  --text-shadow-color: hsl(0deg 0% 0% / 40%);
-  --smooth-mask: linear-gradient(
-    0deg,
-    hsl(0deg 0% 0% / 0%) 0%,
-    hsl(0deg 100% 0% / 42%) 21%,
-    hsl(0deg 100% 0% / 48%) 30%,
-    hsl(0deg 100% 0% / 54%) 39%,
-    hsl(0deg 100% 0% / 62%) 46%,
-    hsl(0deg 100% 0% / 68%) 54%,
-    hsl(0deg 100% 0% / 76%) 61%,
-    hsl(0deg 100% 0% / 84%) 69%,
-    hsl(0deg 100% 0% / 92%) 79%,
-    hsl(0deg 100% 0% / 100%) 100%
-  );
-
-  @media screen and (prefers-color-scheme: light) {
-    --text-shadow-color: hsl(0deg 0% 90% / 30%);
-  }
-
   --titlebar-height: 30px;
-  --fadeout-height: 15px;
 
   &[platform="darwin"] {
     --titlebar-height: 34px;
   }
 }
 
-// smoothly fade out scroll contents on the top
-[data-overlayscrollbars-contents] {
-  mask: linear-gradient(
-    180deg,
-    transparent,
-    rgba(0, 0, 0, 0.9) calc(var(--titlebar-height) * 0.8),
-    rgba(0, 0, 0, 1) calc(var(--titlebar-height)),
-    black
-  );
-  // // scrapped fadeout for both sides - must use easing gradient otherwise it's ugly af.
-  // mask: linear-gradient(
-  //   180deg,
-  //   transparent,
-  //   black calc(var(--fadeout-height)),
-  //   black calc(100% - (var(--fadeout-height))),
-  //   transparent
-  // );
-}
-
-.os-scrollbar {
-  --os-size: 11px;
-  --os-padding-perpendicular: 3px;
-  --os-padding-axis: 0px;
-  --os-track-border-radius: 10px;
-
-  [platform="win32"] & {
-    --os-size: 10px;
-    --os-padding-perpendicular: 4px;
-  }
-
-  // dont let the scrollbar clash into the frame border
-  padding-bottom: 8px;
-  padding-top: calc(var(--titlebar-height) + 4px);
-
-  transition: background-color ease-out 240ms;
-
-  &:hover {
-    background: rgb(0 0 0 / 8%);
-
-    @media screen and (prefers-color-scheme: dark) {
-      background: rgb(255 255 255 / 8%);
-    }
-  }
-}
-
 body {
+  --md-ref-typeface-brand: system-ui;
+  --md-ref-typeface-plain: system-ui;
+
+  --md-sys-color-primary: rgb(212, 40, 40);
+  --md-sys-color-primary-container: rgb(255, 135, 135);
+  --md-sys-color-on-surface-variant: hsla(0 0% 100% / 0.12);
+  --md-sys-color-on-surface: hsla(0 0% 100% / 0.6);
+
   font-family: system-ui;
   margin: auto;
   min-height: 100vh;
@@ -85,24 +28,46 @@ body {
   user-select: none;
 
   overflow: hidden;
-
-  transition: opacity ease-out 80ms;
-
-  [inactive] & {
-    opacity: 0;
-    transition-duration: 0ms;
-  }
 }
 
-html,
-body {
-  background: unset !important;
-}
+// html,
+// body {
+//   background: unset !important;
+// }
 
-#root {
-  display: contents;
+// // smoothly fade out scroll contents on the top
+// [data-overlayscrollbars-contents] {
+//   mask: linear-gradient(
+//     180deg,
+//     transparent,
+//     rgba(0, 0, 0, 0.9) calc(var(--titlebar-height) * 0.8),
+//     rgba(0, 0, 0, 1) calc(var(--titlebar-height)),
+//     black
+//   );
+// }
 
-  > * {
-    color: var(--ehs-color-text);
-  }
-}
+// .os-scrollbar {
+//   --os-size: 11px;
+//   --os-padding-perpendicular: 3px;
+//   --os-padding-axis: 0px;
+//   --os-track-border-radius: 10px;
+
+//   [platform="win32"] & {
+//     --os-size: 10px;
+//     --os-padding-perpendicular: 4px;
+//   }
+
+//   // dont let the scrollbar clash into the frame border
+//   padding-bottom: 8px;
+//   padding-top: calc(var(--titlebar-height) + 4px);
+
+//   transition: background-color ease-out 240ms;
+
+//   &:hover {
+//     background: rgb(0 0 0 / 8%);
+
+//     @media screen and (prefers-color-scheme: dark) {
+//       background: rgb(255 255 255 / 8%);
+//     }
+//   }
+// }

@@ -1,6 +1,7 @@
 import { BrowserWindow, MenuItemConstructorOptions } from "electron";
 import { store } from "../store";
 import { buildDefaultWindowOptions } from "../windows/buildDefaultWindowOptions";
+import { showCompanionSettingsWindow } from "../windows/companionSettings";
 import { mainWindow } from "../windows/mainWindow";
 
 export const stuffsMenu: MenuItemConstructorOptions[] = [
@@ -19,6 +20,12 @@ export const stuffsMenu: MenuItemConstructorOptions[] = [
     label: "Open Storage",
     click(_menuItem, browserWindow, _event) {
       store.openInEditor();
+    },
+  },
+  {
+    label: "Open Settings",
+    async click(_menuItem, browserWindow, _event) {
+      await showCompanionSettingsWindow();
     },
   },
   {

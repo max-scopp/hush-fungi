@@ -18,9 +18,6 @@ export default defineConfig((env) => {
         fileName: () => "[name].js",
         formats: ["es"],
       },
-      // rollupOptions: {
-      //   external,
-      // },
     },
     assetsInclude: "images",
     plugins: [pluginHotRestart("restart")],

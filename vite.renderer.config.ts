@@ -14,6 +14,11 @@ export default defineConfig((env) => {
     base: "./",
     build: {
       outDir: `.vite/renderer/${name}`,
+      // rollupOptions: {
+      //   input: {
+      //     settings: resolve(__dirname, "src/renderer/settings.html"),
+      //   },
+      // },
     },
     plugins: [pluginExposeRenderer(name)],
     resolve: {
